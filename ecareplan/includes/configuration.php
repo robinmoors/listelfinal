@@ -20,7 +20,7 @@ class ECPConfig {
 	public $list_limit = '30';
         public $standard_SID = 'listelvzwbe'; //noodzakelijk om meerdere ecareplannen te runnen vanuit 1 server..
         public $standard_url = "www.listel.be";
-        public $base_url = "http://localhost/listel_new";
+        public $base_url = "http://localhost/listelfinal";
 
 	/* Database Settings */
 	public $host = 'localhost';				
