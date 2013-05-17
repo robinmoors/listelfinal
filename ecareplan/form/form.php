@@ -188,6 +188,8 @@ class ECP_Form extends ECP_Object {
                     'form-length-max':'Te lang',
                     'form-match-email':'Dit is geen emailadres!',
                     'form-match-date':'Dit is geen datum 'dd/mm/jjjj',
+                    'form-match-telephone':'Dit is geen telefoon 0xx/xx.xx.xx of gsm 04xx/xxx.xxx',
+                    'form-match-postal':'Dit is geen postcode xxxx',
                     'form-nocopy':'Komt niet overeen!',
                     'form-uncomplete':'Niet volledig!',
                     'form-complete':'Ok!',
@@ -197,7 +199,7 @@ class ECP_Form extends ECP_Object {
     }
 
     public static function generateCollector($forms = array()) {
-        if (!is_array($forms) && $forms instanceof ECP_FormObj) {
+        if (!is_array($forms) && $forms instanceof ECP_Form) {
             $formar = array($forms);
         } elseif (!is_array($forms)) {
             return "";
@@ -228,8 +230,64 @@ class ECP_Form extends ECP_Object {
             }
         }
         $script.=" collectorfinished:true
+                };
             };
-                 };";
+        ";
+        return $script;
+    }
+    public static function generateValidationMessages(){
+        return "EQ.messages = {
+                    'form-length-short':'Te kort',
+                    'form-length-max':'Te lang',
+                    'form-match-email':'Dit is geen emailadres!',
+                    'form-match-date':'Dit is geen datum dd/mm/jjjj',
+                    'form-match-telephone':'Dit is geen telefoon 0xx/xx.xx.xx of gsm 04xx/xxx.xxx',
+                    'form-match-postal':'Dit is geen postcode xxxx',
+                    'form-nocopy':'Komt niet overeen!',
+                    'form-uncomplete':'Niet volledig!',
+                    'form-complete':'Ok!',
+                    'form-wrong':'Ongeldig!'
+                };";
+    }
+    
+    public static function generateValidation($forms = array(), $fields = array(), $functionname = "validate") {
+        if (!is_array($forms) && $forms instanceof ECP_Form) {
+            $formar = array($forms);
+        } elseif (!is_array($forms)) {
+            return "";
+        } else {
+            $formar = $forms;
+        }
+
+        if (!is_array($fields) && $fields instanceof ECP_FormObj) {
+            $fieldar = array($fields);
+        } elseif (!is_array($fields)) {
+            return "";
+        } else {
+            $fieldar = $fields;
+        }
+
+        $script = " $functionname = function(values){
+                        var b = true;
+                ";
+        foreach ($formar as $form) {
+            foreach ($fieldar as $field) {
+                if (!is_null($form->$field)) {
+                    $f = $form->$field;
+                    switch ($f->type) {
+                        default:
+                            $script .= "if(!EQ.formCheck('',$f->script,'{$form->name}',{value:values.{$f->name},name:'{$f->name}'})) b = false;
+                            ";
+                            break;
+                        case "radio": case "select":
+                            break;
+                    }
+                }
+            }
+        }
+        $script.="
+            };
+        ";
         return $script;
     }
 
@@ -566,10 +624,10 @@ class ECP_FormObj_Hulpverlener extends ECP_FormObj_Input {
 
 class ECP_FormObj_Telefoon extends ECP_FormObj_Input {
 
-    public function __CONSTRUCT($fieldname = false, $minlength = 12, $maxlength = 15) {
+    public function __CONSTRUCT($fieldname = false, $minlength = 11, $maxlength = 15) {
         parent::__CONSTRUCT($fieldname, $minlength, $maxlength);
         $this->type = "telephone";
-        $this->script = "12,15,'telephone'";
+        $this->script = "11,15,'telephone'";
     }
 
     public function validate() {
@@ -595,6 +653,7 @@ class ECP_FormObj_Postcode extends ECP_FormObj_Input {
     public function __CONSTRUCT($fieldname = false) {
         parent::__CONSTRUCT($fieldname, 4, 4);
         $this->type = "postal";
+        $this->script = "4,4,'postal'";
     }
 
     public function validate() {

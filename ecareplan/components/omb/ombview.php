@@ -112,7 +112,7 @@ class ECP_Comp_OmbView implements ECP_OverlegObservable{
          * soortAnders
          */
         $this->setState("meldingform.content.melding.anders.start");
-        $meldinganders="<div class='box hidden' id='meldinganders'>
+        $meldinganders="<div class='box' id='meldinganders'>
             <h5>Andere:</h5>".
                 $form[2]->getHtml("normal",array("naam"=>"Naam","adres"=>"Adres","postcode"=>"Postcode","telefoon"=>"Telefoon","email"=>"e-mail","relatielist"=>"Relatie met het slachtoffer","detail"=>"Relatiedetails")).
                 "</div>";
@@ -139,8 +139,10 @@ class ECP_Comp_OmbView implements ECP_OverlegObservable{
         unset($content); unset($meldinghvl); unset($meldinganders); unset($send);
         
         
-        $this->script = ECP_Form::generateCollector($form)."
-            setInterval(function(){valueCollector();},500);";
+        $this->script = ECP_Form::generateCollector($form)
+                .ECP_Form::generateValidationMessages()
+                .ECP_Form::generateValidation($form, array("naam","adres","postcode","telefoon","email","details"),"validate")
+                ."setInterval(function(){validate(valueCollector());},500);";
         /*
          * SCRIPT
          */
