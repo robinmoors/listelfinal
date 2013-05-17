@@ -91,7 +91,7 @@ class ECP_Comp_OmbView implements ECP_OverlegObservable{
          * melding
          */
         $this->setState("meldingform.content.melding.start");
-        $content = $form[0]->getHtml("normal",array("datum"=> "dd/mm/jjjj","contactwijzelijst"=>"Contactwijze","meldpunt"=>"Contactname met Vlaams Meldpunt (078/15.15.70)","meldersoort"=>"Melder-soort"));
+        $content = "<div id='melding' class='box'>".$form[0]->getHtml("normal",array("datum"=> "dd/mm/jjjj","contactwijzelijst"=>"Contactwijze","meldpunt"=>"Contactname met Vlaams Meldpunt (078/15.15.70)","meldersoort"=>"Melder-soort"))."</div>";
         $this->stack.=$content;
         $this->setState("meldingform.content.melding.end");
         $this->moveToContent();
@@ -100,9 +100,9 @@ class ECP_Comp_OmbView implements ECP_OverlegObservable{
          * soortHvl
          */
         $this->setState("meldingform.content.melding.hvl.start");
-        $meldinghvl = "<div class='box' id='meldinghvl' class='hidden'>
+        $meldinghvl = "<div class='box hidden' id='meldinghvl'>
             <h5>Hulpverlener</h5>"
-        .$this->content .= $form[1]->getHtml("normal",array("hulpverlener"=>"Naam")).
+        .$form[1]->getHtml("normal",array("hulpverlener"=>"Naam")).
         "</div>";
         $this->stack .=$meldinghvl;
         $this->setState("meldingform.content.melding.hvl.end");
@@ -138,6 +138,9 @@ class ECP_Comp_OmbView implements ECP_OverlegObservable{
         
         unset($content); unset($meldinghvl); unset($meldinganders); unset($send);
         
+        
+        $this->script = ECP_Form::generateCollector($form)."
+            setInterval(function(){valueCollector();},500);";
         /*
          * SCRIPT
          */
@@ -167,7 +170,7 @@ class ECP_Comp_OmbView implements ECP_OverlegObservable{
         */
        
         $this->title = "Melding";
-        $this->script=$script;
+        //$this->script=$script;
         $this->export();
     }
 

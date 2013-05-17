@@ -23,7 +23,7 @@ class ECP_Template_Listel extends ECP_Template {
                 <h1>LISTEL vzw</h1>
             </div>
             <div class='userbar'>
-                <div class='menuicon'><img src='/listel_new/lib/images/24/user.png' alt='U' title='Gebruikersmenu openen'/></div>
+                <div class='menuicon'><img src='/listelfinal/lib/images/24/user.png' alt='U' title='Gebruikersmenu openen'/></div>
                 <div class='menutitle'>{[user-name]}</div>
                 <div class='menusuboption'>{[login-button]}</div>
             </div>
@@ -31,22 +31,22 @@ class ECP_Template_Listel extends ECP_Template {
         <nav class='selfclear'>
             <ul>
                 <li>
-                    <img src='/listel_new/lib/images/home.png' alt='H' title='Homepagina'/> <span class='content'>Home</span>
+                    <img src='/listelfinal/lib/images/home.png' alt='H' title='Homepagina'/> <span class='content'>Home</span>
                 </li>
                 <li>
-                    <a href='javascript:void()' onclick='EQ.reRoute(\"overleg\",true);'><img src='/listel_new/lib/images/balloons.png' alt='O' title='Overleg...'/> <span class='content'>Overleg</span></a>
+                    <a href='javascript:void()' onclick='EQ.reRoute(\"overleg\",true);'><img src='/listelfinal/lib/images/balloons.png' alt='O' title='Overleg...'/> <span class='content'>Overleg</span></a>
                 </li>
                 <li>
-                    <img src='/listel_new/lib/images/marker.png' alt='E' title='Evaluaties...'/> <span class='content'>Evaluaties</span>
+                    <img src='/listelfinal/lib/images/marker.png' alt='E' title='Evaluaties...'/> <span class='content'>Evaluaties</span>
                 </li>
                 <li>
-                    <img src='/listel_new/lib/images/drawer.png' alt='Z' title='Zorgplannen...'/> <span class='content'>Zorgplannen</span>
+                    <img src='/listelfinal/lib/images/drawer.png' alt='Z' title='Zorgplannen...'/> <span class='content'>Zorgplannen</span>
                 </li>
                 <li>
-                    <img src='/listel_new/lib/images/chair.png' alt='OZ' title='Ouderenzorg...'/><a href='javascript:void()' onclick='EQ.reRoute(\"omb\",true);'> <span class='content'>Ouderenbehandeling</span></a>
+                    <img src='/listelfinal/lib/images/chair.png' alt='OZ' title='Ouderenzorg...'/><a href='javascript:void()' onclick='EQ.reRoute(\"omb\",true);'> <span class='content'>Ouderenbehandeling</span></a>
                 </li>
                 <li>
-                    <img src='/listel_new/lib/images/briefcase.png' alt='F' title='Formulieren...'/> <span class='fastcontent'>Formulieren</span>
+                    <img src='/listelfinal/lib/images/briefcase.png' alt='F' title='Formulieren...'/> <span class='fastcontent'>Formulieren</span>
                 </li>
             </ul>
         </nav>

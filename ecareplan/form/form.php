@@ -186,7 +186,8 @@ class ECP_Form extends ECP_Object {
             EQ.messages = {
                     'form-length-short':'Te kort',
                     'form-length-max':'Te lang',
-                    'form-match':'Dit is geen emailadres!',
+                    'form-match-email':'Dit is geen emailadres!',
+                    'form-match-date':'Dit is geen datum 'dd/mm/jjjj',
                     'form-nocopy':'Komt niet overeen!',
                     'form-uncomplete':'Niet volledig!',
                     'form-complete':'Ok!',
@@ -212,18 +213,22 @@ class ECP_Form extends ECP_Object {
                 switch ($form->$name->type) {
 
                     case "radio":
-                        $script .= "$name : radioValue(document.{$form->name}.$name);";
+                        $script .= "$name : EQ.radioValue(document.{$form->name}.$name),
+                                ";
                         break;
                     case "checkbox":
-                        $script .= "$name : document.{$form->name}.$name.checked";
+                        $script .= "$name : document.{$form->name}.$name.checked,
+                                ";
                         break;
                     default: case "select": case "input":
-                        $script .= "$name : document.{$form->name}.$name.value";
+                        $script .= "$name : document.{$form->name}.$name.value,
+                                ";
                         break;
                 }
             }
         }
-        $script.=" };
+        $script.=" collectorfinished:true
+            };
                  };";
         return $script;
     }
@@ -238,7 +243,6 @@ class ECP_FormObj {
     protected $msg = "";
     protected $placeholder;
     protected $script;
-    protected $type = "input";
 
     public function __CONSTRUCT($fieldname = false) {
         if (!$fieldname)
@@ -455,11 +459,12 @@ class ECP_FormObj_Password extends ECP_FormObj_Input {
 
 }
 
-class ECP_FormObj_Email extends ECP_FormObj {
+class ECP_FormObj_Email extends ECP_FormObj_Input {
 
     public function __CONSTRUCT($fieldname = false) {
         parent::__CONSTRUCT($fieldname);
-        $this->script = "'x','x',true";
+        $this->script = "'x','x','email'";
+        $this->type = "email";
     }
 
     public function validate() {
@@ -526,12 +531,18 @@ class ECP_FormObj_NormalButton extends ECP_FormObj {
 class ECP_FormObj_Date extends ECP_FormObj_Input {
 
     public function __CONSTRUCT($fieldname = false, $minlength = 0, $maxlength = 30) {
-        parent::__CONSTRUCT($fieldname, 11, 11);
+        parent::__CONSTRUCT($fieldname, 8, 10);
         $this->type = "date";
+        $this->script = "8,10,'date'";
     }
 
     public function validate() {
-        
+        $reg = '/^([1-9]|0[1-9]|[12][0-9]|3[01])([/])([1-9]|0[1-9]|1[012])\2(19|20)\d\d$/';
+        if (!preg_match($reg, $this->value)) {
+            $this->msg = "match";
+            return false;
+        }
+        return true;
     }
 
     public function getHtml($formname, $class) {
@@ -555,13 +566,14 @@ class ECP_FormObj_Hulpverlener extends ECP_FormObj_Input {
 
 class ECP_FormObj_Telefoon extends ECP_FormObj_Input {
 
-    public function __CONSTRUCT($fieldname = false, $minlength = 9, $maxlength = 9) {
+    public function __CONSTRUCT($fieldname = false, $minlength = 12, $maxlength = 15) {
         parent::__CONSTRUCT($fieldname, $minlength, $maxlength);
         $this->type = "telephone";
+        $this->script = "12,15,'telephone'";
     }
 
     public function validate() {
-        $reg = '/^[0-9]{9}/$';
+        $reg = '/^(0)([1-35-9][0-9]|[4][0-9][0-9])[/]((\d\d\d[.]\d\d\d)|(\d\d[.]\d\d[.]\d\d))$/';
         if (!preg_match($reg, $this->value)) {
             $this->msg = "match";
             return false;
@@ -570,7 +582,7 @@ class ECP_FormObj_Telefoon extends ECP_FormObj_Input {
     }
 
     public function getHtml($formname, $class) {
-        return "<input type='text' maxlength='9' name='{$this->name}' value='' placeholder='{$this->placeholder}' class='{$class}'
+        return "<input type='text' maxlength='15' name='{$this->name}' value='' placeholder='{$this->placeholder}' class='{$class}'
             onfocus=''
             onchange=''
             /><span id='{$formname}{$this->name}'></span><br></br>";
@@ -586,7 +598,7 @@ class ECP_FormObj_Postcode extends ECP_FormObj_Input {
     }
 
     public function validate() {
-        $reg = '/^[1-9]{1}[0-9]{3}/$';
+        $reg = '/^[1-9]\d{3}$/';
         if (!preg_match($reg, $this->value)) {
             $this->msg = "match";
             return false;
