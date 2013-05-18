@@ -13,7 +13,7 @@
  */
 defined("ECP_AC") or die("Stop! Wat we onder de motorkap hebben zitten houden we liever verborgen.");
 
-class ECP_User extends ECP_Object {
+class ECP_User extends ECP_Object implements ECP_FactoryInterface{
 
     //put your code here
     private $id = null;
