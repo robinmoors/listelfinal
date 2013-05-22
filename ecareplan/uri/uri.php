@@ -22,13 +22,12 @@ class ECP_URI extends ECP_Object implements ECP_FactoryInterface{
     protected $uri;
     
     protected $vars;
-    /**
-     * @var    array  An array of JURI instances.
-     * @since  11.1
-     */
+
     protected static $instances = array();
 
     public function __CONSTRUCT() {
+        filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        filter_input_array(INPUT_GET, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $this->uri = $_SERVER['REQUEST_URI'];
         $requestURI = explode('/', $_SERVER['REQUEST_URI']); //echte url
         $scriptname = explode('/', $_SERVER['SCRIPT_NAME']); //server url (dus de herschreven waarde)
@@ -69,10 +68,10 @@ class ECP_URI extends ECP_Object implements ECP_FactoryInterface{
     }
 
     /**
-     * Returns the global JURI object, only creating it
+     * Returns the global ECP_URI object, only creating it
      * if it doesn't already exist.
      * @param   string  $uri  The URI to parse.  [optional: if null uses script URI]
-     * @return  JURI  The URI object.
+     * @return  \ECP_URI  The URI object.
      */
     public static function getInstance($uri = 'SERVER') {
         if (empty(self::$instances[$uri])) {
@@ -84,7 +83,7 @@ class ECP_URI extends ECP_Object implements ECP_FactoryInterface{
     /**
      * Returns the userid if given in url!
      * If not, returns null
-     * 
+     * @return integer The UID or null if false value
      */
     public function getUserId(){
         if($this->vars){
@@ -94,10 +93,9 @@ class ECP_URI extends ECP_Object implements ECP_FactoryInterface{
             }else{
                 $id = $this->vars;
             }
-            if(intval($id)) return intval($id);
-            else return 0;
+            return filter_var($id,FILTER_VALIDATE_INT);
         }else{
-            return 0;
+            return null;
         }
     }
 
