@@ -23,9 +23,15 @@ class ECP_FormObj {
         $this->type = "input";
     }
 
+    /**
+     * Vul de waarde van het veld in.
+     * Om de veiligheid te verhogen wordt de input meteen gefilterd met sanitize_full_special_chars
+     * @param mixed $value
+     * @return \ECP_FormObj chainability
+     */
     public function insert($value) {
-        $this->value = trim($value);
-        return true;
+        $this->value = filter_var($value, FILTER_SANITIZE_FULL_SPECIAL_CHARS);   //trim($value);
+        return $this;
     }
 
     public function validate() {
@@ -101,11 +107,22 @@ class ECP_FormObj_Checkbox extends ECP_FormObj {
 
         $this->type = "checkbox";
     }
+    
+    /**
+     * Voeg de waarde van dit veld toe.
+     * Omdat het om een checkbox gaat wordt die waarde meteen gevalideerd met een booleanfilter.
+     * @param mixed $value true, 1, yes of false,0, no
+     * @return \ECP_FormObj_Button chainability
+     */
+    public function insert($value){
+        $this->value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        return $this;
+    }
 
     public function validate() {
-        if ($this->value == '1' && $this->tobechecked)
+        if ($this->value === true && $this->tobechecked)
             return true;
-        else if ($this->value == '0' && !$this->tobechecked)
+        else if ($this->value === false && !$this->tobechecked)
             return true;
         else
             return false;
@@ -137,6 +154,17 @@ class ECP_FormObj_Button extends ECP_FormObj {
         $this->script = "0,0,false";
         $this->type = "button";
     }
+    
+    /**
+     * Voeg waarde toe aan het buttonveld.
+     * Vermits het om een knop gaat hoeven we geen waarde te hebben.
+     * Om de veiligheid te verhogen wordt deze methode overschreven.
+     * @return \ECP_FormObj_Button chainability
+     */
+    public function insert(){
+        $this->value = $this->text;
+        return $this;
+    }
 
     public function validate() {
         return true;
@@ -148,19 +176,13 @@ class ECP_FormObj_Button extends ECP_FormObj {
 
 }
 
-class ECP_FormObj_NormalButton extends ECP_FormObj {
-
-    private $text;
+class ECP_FormObj_NormalButton extends ECP_FormObj_Button {
 
     public function __CONSTRUCT($name, $text) {
         $this->name = $name;
         $this->text = $text;
         $this->script = "0,0,false";
         $this->type = "button";
-    }
-
-    public function validate() {
-        return true;
     }
 
     public function getHtml($formname, $class) {

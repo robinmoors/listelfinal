@@ -19,14 +19,23 @@ class ECP_FormObj_Email extends ECP_FormObj_Input {
         $this->script = "'x','x','email'";
         $this->type = "email";
     }
+    
+    
+    /**
+     * Vul de waarde van het veld in.
+     * Omdat het om een email gaat wordt er meteen gefilterd op email-karakters!
+     * @param mixed $value
+     * @return \ECP_FormObj_Email
+     */
+    public function insert($value){
+        $this->value = filter_var($value,FILTER_SANITIZE_EMAIL);
+        return $this;
+    }
 
     public function validate() {
-        $reg = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
-        if (!preg_match($reg, $this->value)) {
-            $this->msg = "match";
-            return false;
-        }
-        return true;
+        $validation = filter_var($this->value, FILTER_VALIDATE_EMAIL);
+        if($validation===false) $this->msg="match"; //indien leeg is $validation null
+        return $validation;
     }
 
     public function getHtml($formname, $class) {
@@ -96,6 +105,21 @@ class ECP_FormObj_Postcode extends ECP_FormObj_Input {
         $this->script = "4,4,'postal'";
     }
 
+    /**
+     * Vul de waarde van het veld in.
+     * Vermits het om een postcode gaat wordt meteen gefilterd op integers
+     * @param mixed $value
+     * @return \ECP_FormObj_Postcode chainability
+     */
+    public function insert($value){
+        $this->value = filter_var($value, FILTER_SANITIZE_NUMBER_INT);
+        return $this;
+    }
+    
+    /**
+     * Valideer op geldige postcode (alleen op vorm, niet op effectief bestaande nummers!)
+     * @return boolean true bij goed, false bij slecht
+     */
     public function validate() {
         $reg = '/^[1-9]\d{3}$/';
         if (!preg_match($reg, $this->value)) {
