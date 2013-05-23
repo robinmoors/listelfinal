@@ -526,12 +526,25 @@ class ECP_FormObj_Email extends ECP_FormObj_Input {
     }
 
     public function validate() {
+        $email = filter_var($this->value, FILTER_SANITIZE_EMAIL);  
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {  
+            $this->msg = "match";
+            return false;
+        } 
+        return true;
+        
+        /*
+         * old method with reg exp
+         */
+        /*
         $reg = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
         if (!preg_match($reg, $this->value)) {
             $this->msg = "match";
             return false;
         }
         return true;
+         */
+         
     }
 
     public function getHtml($formname, $class) {
@@ -582,10 +595,6 @@ class ECP_FormObj_NormalButton extends ECP_FormObj {
 
 }
 
-/*
- * Speciale FormObj met javascript
- */
-
 class ECP_FormObj_Date extends ECP_FormObj_Input {
 
     public function __CONSTRUCT($fieldname = false, $minlength = 0, $maxlength = 30) {
@@ -604,20 +613,47 @@ class ECP_FormObj_Date extends ECP_FormObj_Input {
     }
 
     public function getHtml($formname, $class) {
-        return "<input type='text' maxlength='11' name='{$this->name}' value='' placeholder='{$this->placeholder}' class='{$class}'
-            onchange='EQ.formCheckDate();'
-            /><span id='{$formname}{$this->name}'></span><br></br>";
+        return "<input type='text' maxlength='11' name='{$this->name}' value='' placeholder='{$this->placeholder}' class='{$class}'/><span id='{$formname}{$this->name}'></span><br></br>";
     }
 
 }
 
 class ECP_FormObj_Hulpverlener extends ECP_FormObj_Input {
 
+    public function __CONSTRUCT($fieldname = false, $minlength = 0, $maxlength = 30) {
+        parent::__CONSTRUCT($fieldname, $minlength, $maxlength);
+        $this->type = "hulpverlener";
+        $this->script="0,30,'hulpverlener'";
+    }
+    
+    //komt naam = "voornaam achternaam"
+    public function validate(){
+        $naam = filter_var($this->value, FILTER_SANITIZE_STRING);
+        $name = explode(" ", $naam);
+        if(count($name)==2){
+            //gewoon voor-en achternaam
+            $voornaam = $name[0];
+            $achternaam = $name[1];
+        } else {
+            //achternaam telt meerdere delen
+            $voornaam = $name[0];
+            for($i=1;$i<count($name);$i++){
+                //moet misschien nog worden aangepast, spaties
+                $achternaam .=$name[$i];
+            }
+        }
+        self::$db = ECPFactory::getPDO("Hulpverleners","class");
+        $hvl = new Hulpverleners();
+        $hvl->setNaam($achternaam) ->setVoornaam($voornaam);
+        $result = $hvl->findByExample($db, $hvl, true);
+        if(empty($result)){
+            $this->msg="match";
+            return false;
+        } return true;
+    }
+    
     public function getHtml($formname, $class) {
-        return "<input type='text' name='{$this->name}' value='' placeholder='{$this->placeholder}' 
-            onkeyup='' 
-            onclick='' 
-            class='{$class}'/><span id='{$formname}{$this->name}'></span><br/>";
+        return "<input type='text' name='{$this->name}' value='' placeholder='{$this->placeholder}'class='{$class}'/><span id='{$formname}{$this->name}'></span><br/>";
     }
 
 }
@@ -640,10 +676,7 @@ class ECP_FormObj_Telefoon extends ECP_FormObj_Input {
     }
 
     public function getHtml($formname, $class) {
-        return "<input type='text' maxlength='15' name='{$this->name}' value='' placeholder='{$this->placeholder}' class='{$class}'
-            onfocus=''
-            onchange=''
-            /><span id='{$formname}{$this->name}'></span><br></br>";
+        return "<input type='text' maxlength='15' name='{$this->name}' value='' placeholder='{$this->placeholder}' class='{$class}'/><span id='{$formname}{$this->name}'></span><br></br>";
     }
 
 }
@@ -666,11 +699,7 @@ class ECP_FormObj_Postcode extends ECP_FormObj_Input {
     }
 
     public function getHtml($formname, $class) {
-        return "<input type='text' maxlength='4' name='{$this->name}' value='' placeholder='{$this->placeholder}' class='{$class}'
-            onfocus=''
-            onmouseup=''
-            onkeyup=''
-            /><span id='{$formname}{$this->name}'></span><br></br>";
+        return "<input type='text' maxlength='4' name='{$this->name}' value='' placeholder='{$this->placeholder}' class='{$class}'/><span id='{$formname}{$this->name}'></span><br></br>";
     }
 
 }
