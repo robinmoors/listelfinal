@@ -23,6 +23,7 @@ if (!class_exists('ECPLoader')) {
 
 // Basis
 ECPLoader::import('core.object');
+ECPLoader::import('core.factoryinterface');
 // Omgeving
 
 // EcarePlan class and methods.

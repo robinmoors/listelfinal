@@ -13,7 +13,7 @@
  */
 defined("ECP_AC") or die("Stop! Wat we onder de motorkap hebben zitten houden we liever verborgen.");
 
-class ECP_Session extends ECP_Object {
+class ECP_Session extends ECP_Object implements ECP_FactoryInterface{
 
     /**
      * Session State

@@ -57,11 +57,34 @@ class ECPConfig {
 	public $feed_limit = 10;
 	public $feed_email = 'author';
         
-        public function __toString() {
-            return "Hey, ja deze site heeft een configuratieklasse. Maar we vertellen je niet wat er in zit!";
-        }
+        /* Expandable settings */
+        //Dit kan je gebruiken om eventueel extra instellingen globaal te maken tijdens de uitvoer van het framework :)
+        //je kan dit ook handig bereiken via de magic getters en setters :)
+        private $extconfig = array();
         
         public function get($name){
             return $this->$name;
+        }
+        
+        public function __GET($name){
+            if(array_key_exists($this->extconfig, $name)) return $this->extconfig[$name];
+            else return null;
+        }
+        
+        public function __SET($name,$value){
+            $this->extconfig[$name] = $value;
+            return true;
+        }
+        
+        public function __UNSET($name){
+            unset($this->extconfig[$name]);
+        }
+        
+        public function __ISSET($name){
+            return isset($this->extconfig[$name]);
+        }
+        
+        public function __toString() {
+            return "Hey, ja deze site heeft een configuratieklasse. Maar we vertellen je niet wat er in zit!";
         }
 }
