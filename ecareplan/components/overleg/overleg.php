@@ -69,12 +69,15 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                 $overleg = $this->model->getOverlegById($this->vars[1]);
                 $this->view->editOverleg($overleg, $formmodel->getForm("edit"));
             } else {
-                $patient = $this->model->getOverleg($this->vars[0]);
-                if (count($patient) > 1) { //meer dan 1 overleg gevonden dus daar uit kiezen...
-                    $this->view->viewOverlegList($patient);
+                //we hebben de code nodig en niet de ID dus eerst omzetten!!
+                $aanvraag = $this->model->getOverlegAanvraag($this->vars[0]);
+                if (count($aanvraag) > 1) { //meer dan 1 overleg gevonden dus daar uit kiezen...
+                    
+                    $this->view->viewOverlegList($aanvraag);
                 }
                 else
-                    $this->view->editOverleg($patient, $formmodel->getForm("edit")); //maar 1 overleg dus dat ook bewerken...
+                    $this->view->viewAanvraagOverleg($aanvraag);
+                    //$this->view->editOverleg($aanvraag, $formmodel->getForm("edit")); //maar 1 overleg dus dat ook bewerken...
             }
         }else {
             $this->std_command();

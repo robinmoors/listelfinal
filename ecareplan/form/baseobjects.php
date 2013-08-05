@@ -151,7 +151,7 @@ class ECP_FormObj_Button extends ECP_FormObj {
     public function __CONSTRUCT($text) {
         $this->name = "submit";
         $this->text = $text;
-        $this->script = "0,0,false";
+        $this->script = "0,99,false";
         $this->type = "button";
     }
     
@@ -171,7 +171,7 @@ class ECP_FormObj_Button extends ECP_FormObj {
     }
 
     public function getHtml($formname, $class) {
-        return "<input type='button' id='{$formname}-form' name='button' value='{$this->text}' class='{$class}'/><span id='{$formname}{$this->name}'></span><br/>";
+        return "<input type='button' id='{$formname}-form' name='{$this->name}' value='{$this->text}' class='{$class}'/><span id='{$formname}{$this->name}'></span><br/>";
     }
 
 }
@@ -181,7 +181,7 @@ class ECP_FormObj_NormalButton extends ECP_FormObj_Button {
     public function __CONSTRUCT($name, $text) {
         $this->name = $name;
         $this->text = $text;
-        $this->script = "0,0,false";
+        $this->script = "0,99,false";
         $this->type = "button";
     }
 

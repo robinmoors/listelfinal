@@ -1,4 +1,5 @@
 <?php
+
 //include_once '../../database/Logins.class.php';
 /*
  * To change this template, choose Tools | Templates
@@ -16,66 +17,74 @@ class ECP_Comp_Login_Model {
 
     public function __CONSTRUCT() {
         $this->loginform = ECPFactory::getForm("login");
-        $this->loginform->addField(new ECP_FormObj_Input("login",3,30));
-        $this->loginform->addField(new ECP_FormObj_Password("password", 8, 30));
+        $this->loginform->addField(new ECP_FormObj_Input("login", 3, 30));
+        $this->loginform->addField(new ECP_FormObj_Password("password", 5, 30));
         $this->loginform->addField(new ECP_FormObj_Button("Aanmelden"));
         $this->eidform = ECPFactory::getForm("eid");
-        $this->eidform->addField(new ECP_FormObj_NormalButton("eid","Login met eID"));
+        $this->eidform->addField(new ECP_FormObj_NormalButton("eid", "Login met eID"));
     }
-    private static function resultToArray($result,$names){
-        if(!is_array($names) || $result==null) return null;
-        foreach($result as $resource){//array van objecten dus een object nemen..
-            $res=$resource->toArray();//dat object omzetten naar array
-            foreach($res as $key => $value){
+
+    private static function resultToArray($result, $names) {
+        if (!is_array($names) || $result == null)
+            return null;
+        foreach ($result as $resource) {//array van objecten dus een object nemen..
+            $res = $resource->toArray(); //dat object omzetten naar array
+            foreach ($res as $key => $value) {
                 $ar[$names[$key]] = $value; //hier gebeurd de key-wissel..
             }
             $data[] = $ar; //alles netjes terug in een array zetten :)
         }
         return $data;
     }
+
     public function login() {
         /*
-        $db = ECPFactory::getDbo();
+          $db = ECPFactory::getDbo();
          * */
         ecpimport("helpers.cryptology");
         $db = ECPFactory::getPDO("Logins");
-        
-        $pasw = 'c17a1a963e2b9ebb228030c0615fdb4bd91bd982';
-        //$pasw = ECPFactory::getForm("login")->pasw->value;
-        $login = 'joris-rdc';
-        
+
+        //$pasw = 'c17a1a963e2b9ebb228030c0615fdb4bd91bd982';
+        $pasw = ECPFactory::getForm("login")->password->value;
+        //$login = 'joris-rdc';
+        $login = ECPFactory::getForm("login")->login->value;
         $loginpin = ECP_Cryptology::generateInteger(30);
         $pinhash = ECP_Cryptology::generateHash($loginpin);
-        
-        
-        $log=new Logins();
-        $log->setLogin($login)->setPaswoord($pasw);
+
+        $hpasw = ECP_Cryptology::generateHash($pasw); //md5 hash via crypt
+        $ohpasw = sha1($pasw); //sha1 hash voor oude ww's..
+
+        $log = new Logins();
+        $log->setLogin($login)->setPaswoord($hpasw);
         $results = Logins::findByExample($db, $log);
-        if(empty($results)){
+        if (empty($results)) {
             //email en ww komt niet overeen
-            return false;
-        }else{
-            foreach ($results as $result) {
-                $id = $result->getId();
-                $result->setIpadres($_SERVER['REMOTE_ADDR'])->setLoginpin($pinhash);
-                $count = $result->updateToDatabase($db);
-                if($count!=l) return 2; //fout bij updaten dus geen access!
-                else{
-                    return array("uid"=>$id,"pin"=>$loginpin);
-                }
+            //mss was het een oud wachtwoord?
+            $log->setPaswoord($ohpasw);
+            $results = Logins::findByExample($db, $log);
+            if (empty($results)) {
+                return false;
+            }
+        }
+        //als alles in orde is toch maar doorgaan...
+        foreach ($results as $result) {
+            $id = $result->getId();
+            $result->setIpadres($_SERVER['REMOTE_ADDR'])->setLoginpin($pinhash);
+            $count = $result->updateToDatabase($db);
+            if ($count != l)
+                return 2; //fout bij updaten dus geen access!
+            else {
+                return array("uid" => $id, "pin" => $loginpin);
             }
         }
     }
 
     public function loginpage() {
         $script = "$('#eid-eid').bind('click',function(){EQ.reRoute('eid',true);});";
-        $script .= $this->loginform->getScript("/listel_new/ecareplan/login/login/",
-                array("title"=>"Aanmelden",
-                    "action"=>"Bezig met aanmelden...",
-                    "succes"=>"U bent aangemeld <br/><img src=\'/listel_new/lib/images/flat-loader.gif\' />",
-                    "fail"=>"Er is iets misgegaan. Probeer opnieuw!"),
-                "EQ.reRoute('home');","",
-                "else if(json.reason && json.reason=='no-access'){
+        $script .= $this->loginform->getScript("/listelfinal/ecareplan/login/login/", array("title" => "Aanmelden",
+            "action" => "Bezig met aanmelden...",
+            "succes" => "U bent aangemeld <br/><img src=\'/listelfinal/lib/images/flat-loader.gif\' />",
+            "fail" => "Er is iets misgegaan. Probeer opnieuw!"), "EQ.reRoute('home');", "", "else if(json.reason && json.reason=='no-access'){
                                 EQ.OVR.content='Emailadres of wachtwoord fout!';
                                 EQ.OVR.refresh('c');
                             }");
@@ -84,10 +93,10 @@ class ECP_Comp_Login_Model {
                 "login", array("email" => "Email voor login",
             "password" => "Wachtwoord")
         );
-        $content.=$this->eidform->getHtml("login",array());
-        
-        
-        
+        $content.=$this->eidform->getHtml("login", array());
+
+
+
         return array("content" => $content, "headscript" => $script);
     }
 

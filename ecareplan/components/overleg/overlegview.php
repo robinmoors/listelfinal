@@ -85,7 +85,7 @@ class ECP_Comp_OverlegView implements ECP_OverlegObservable{
         $content.="</tr>";
         if($data!=null){
         foreach ($data as $patient) {
-            $content.="<tr id='TableRow' onclick='EQ.reRoute(\"overlegbewerk\",true,{$patient[0]});'>";
+            $content.="<tr id='TableRow' onclick='EQ.reRoute(\"overlegbewerk\",true,{$patient['id']});'>";
             for ($i = 0; $i < count($keys); $i++) {
                 $content.="<td>{$patient[$keys[$i]]}</td>";
             }
@@ -136,7 +136,35 @@ class ECP_Comp_OverlegView implements ECP_OverlegObservable{
         $this->setState("viewoverleglist.end");
         $this->export();
     }
+    public function viewOverlegAanvraag($data){
+        if ($data === null || $data === false) {
+            $this->content = "Deze pati&euml;nt blijkt geen aanvraag te hebben! <a onclick='EQ.reRoute(\"overleg\",true)'>Keer terug naar patientenlijst. (Ook om er een aan te maken)</a>";
+            $this->export();
+        } else {
+            print_r($data);
+            $content = "<div class='box'>
+                            <h5>Pati&euml;ntinfo</h5>
+                            <p>
+                            Rijksregisternummer: {$data[0]['rijksregister']} <br/>
+                            Volgnummer: SO98 - {$data[0]['code']} <br/>
+                            Pati&euml;ntnaam: {$data[0]['naam']} <br/>
+                            </p><h5>Gegevens Aanvrager</h5>
+                            <p>
+                            Aanvrager: mr x<br/>
+                            Doel: het doel
+                            </p>
+                    </div><div class='box'>
+                                <h5>Overleg Plannen:</h5><br/>";
+            $content.=ECPFactory::getForm("aanvraagplannen")->getHtml("normal", array("locatie" => "Plaats van het overleg:<br/>", "aanwezig" => "Wie is er aanwezig op het overleg?<br/>", "instemming" => "Instemming met de deelnemers van het overleg. De pati&euml;nt of vertegenwoordiger?<br/>"))
+                    ."</div>";
 
+
+            $this->title = "Overleg bewerken";
+            $this->content = $content;
+            $this->script = $script;
+            $this->export();
+        }
+    }
     public function editOverleg($data, $form) {
         if ($data === null || $data === false) {
             $this->content = "Deze pati&euml;nt blijkt geen overleggen te hebben! <a onclick='EQ.reRoute(\"overleg\",true)'>Keer terug naar patientenlijst. (Ook om er een aan te maken)</a>";

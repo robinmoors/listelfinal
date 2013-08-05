@@ -119,15 +119,18 @@ class ECP_Comp_OverlegModel {
         return self::resultToArray($result, Organisatie::getFieldNames());
     }
     
-    public function getOverleg($patientid=null){
-        if($patientid==null){
-            return null; //geen patient opgegeven
+    public function getOverlegAanvraag($id){
+        if($id==null){
+            return null; //geen id opgegeven
         }else{
-            $patient = $this->db->newQuery("select","patient")->table("patient INNER JOIN overleg ON patient.code = overleg.patient_code INNER JOIN aanvraag_overleg ON overleg.id = aanvraag_overleg.overleg_id")->where("patient.id",$patientid,"=")->execute();
-            if($patient->getRows()<1){
-                return false; //geen patient gevonden met deze id :s
+            self::$db= ECPFactory::getPDO("AanvraagOverleg");
+            $aanvraag = new AanvraagOverleg();
+            $aanvraag -> setId($id);
+            $results = $aanvraag->findByExample(self::$db, $aanvraag);
+            if(empty($results)){
+                return false;
             }else{
-                return self::queryToArray($patient);
+                return self::resultToArray($results, AanvraagOverleg::getFieldNames());
             }
         }
     }

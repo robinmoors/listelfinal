@@ -16,7 +16,7 @@ class ECP_Form extends ECP_Object implements ECP_FactoryInterface {
                     'form-length-short':'Te kort',
                     'form-length-max':'Te lang',
                     'form-match-email':'Dit is geen emailadres!',
-                    'form-match-date':'Dit is geen datum 'dd/mm/jjjj',
+                    'form-match-date':'Dit is geen datum \"dd/mm/jjjj\"',
                     'form-match-telephone':'Dit is geen telefoon 0xx/xx.xx.xx of gsm 04xx/xxx.xxx',
                     'form-match-postal':'Dit is geen postcode xxxx',
                     'form-nocopy':'Komt niet overeen!',
