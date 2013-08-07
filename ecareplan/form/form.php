@@ -348,9 +348,10 @@ class ECP_Form extends ECP_Object implements ECP_FactoryInterface {
                         //laad ook userobjecten in..
                         }
                 });
+                var uid = EQ.getUid();
                 EQ.CPU.newRequest({
                     process: pname,
-                    url:'{$route}',
+                    url:'{$route}/'+uid,
                     parameters:'";
         for ($i = 0; $i < count($this->names); $i++) {
             if ($this->names[$i] != "submit")
