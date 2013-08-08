@@ -16,10 +16,11 @@ ecpimport("database.Overlegbasis", "class");
 class OverlegGewoon extends Overlegbasis{
     
 }
-
+/*
 class OverlegMenos extends Overlegbasis{
     use OverlegOmbTrait;
 }
+ */
 
 /*
 class OverlegLok extends Overlegbasis{

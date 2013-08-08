@@ -119,7 +119,7 @@ class ECP_Comp_OverlegModel {
         return self::resultToArray($result, Organisatie::getFieldNames());
     }
     
-    public function getOverlegAanvraag($id){
+    public function getOverlegAanvraag($id,$obj=false){
         if($id==null){
             return null; //geen id opgegeven
         }else{
@@ -130,6 +130,7 @@ class ECP_Comp_OverlegModel {
             if(empty($results)){
                 return false;
             }else{
+                if($obj) return $results[0];
                 return self::resultToArray($results, AanvraagOverleg::getFieldNames());
             }
         }
@@ -184,6 +185,21 @@ class ECP_Comp_OverlegModel {
             self::$organisations = Organisatie::findByExample(self::$db, $org);
         }
         return self::$organisations;
+    }
+    
+    public function setAanvraagToOverleg(AanvraagOverleg $aanvraag,$datum){
+        self::$db = ECPFactory::getPDO("overlegbasis");
+        ecpimport("database.overleggen.overleggen");
+        $basis = new OverlegGewoon();
+        $basis->setPatientCode($aanvraag->getPatientCode())->setDatum($datum);
+        
+        $aanvraag->setStatus("overleg")->setRedenStatus("overleg gepland");
+        try{
+            $update = $aanvraag->updateToDatabase(self::$db);
+            return true;
+        }catch(Exception $e){
+            ecpexit('{"succes":"negative","message":"Er liep iets grandioos fout!<br/>'.htmlentities($e->getMessage()).'"}');
+        }
     }
     
     public function setAanvraag($pat_id,$data){

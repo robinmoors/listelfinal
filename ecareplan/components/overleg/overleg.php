@@ -164,13 +164,13 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                 if($session->isActive()){
                     ecpimport("components.overleg.base.overlegform");
                     $formmodel = new ECP_Comp_OverlegForm();
-                    $aanvraag = $this->model->getOverlegAanvraag($this->vars[0]);
+                    $aanvraag = $this->model->getOverlegAanvraag($this->vars[0],true);
                     $formmodel->getForm("aanvraag");
                     $error[] = ECPFactory::getForm("aanvraagoverleg")->smartInsert($_POST)->validate();
                     if($error[0]){
                         //de waarde = 1 dus validatie was goed :)
                         //dan gaan we de aanvraag omzetten naar een overleg!! 
-                        
+                        $this->model->setAanvraagToOverleg($aanvraag,  ECPFactory::getForm("aanvraagoverleg")->datum->value);
                         ecpexit('{"succes":"positive","message":"De opgegeven waarde was fout!"}');
                     }else{
                         ecpexit('{"succes":"negative","message":"De opgegeven waarde was fout!","error":"datum"}');
