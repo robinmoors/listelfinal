@@ -96,10 +96,10 @@ class ECP_Comp_Omb_Controller implements ECP_ComponentController {
             $data = $this->tempResultToArray($result, OverlegGewoon::getFieldNames());
             $this->tempCreateOmb($data);
             
-            // bestaand update
+        // bestaand update
             $this->tempUpdateOmb($data);
             
-            //bestaand delete
+        //bestaand delete
             $this->tempDeleteOmb();
             
             
