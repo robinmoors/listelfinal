@@ -62,9 +62,7 @@ class ECP_FormObj_Date extends ECP_FormObj_Input {
     }
 
     public function getHtml($formname, $class) {
-        return "<input type='text' maxlength='11' name='{$this->name}' value='' placeholder='{$this->placeholder}' class='{$class}'
-            onchange='EQ.formCheckDate();'
-            /><span id='{$formname}{$this->name}'></span><br></br>";
+        return "<input type='text' maxlength='11' name='{$this->name}' value='' placeholder='{$this->placeholder}' class='{$class}'/><span id='{$formname}{$this->name}'></span><br></br>";
     }
 
 }

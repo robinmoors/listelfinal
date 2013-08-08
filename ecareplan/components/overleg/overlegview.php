@@ -155,11 +155,14 @@ class ECP_Comp_OverlegView implements ECP_OverlegObservable{
                             </p>
                     </div><div class='box'>
                                 <h5>Overleg Plannen:</h5><br/>";
-            $content.=ECPFactory::getForm("aanvraagplannen")->getHtml("normal", array("locatie" => "Plaats van het overleg:<br/>", "aanwezig" => "Wie is er aanwezig op het overleg?<br/>", "instemming" => "Instemming met de deelnemers van het overleg. De pati&euml;nt of vertegenwoordiger?<br/>"))
+            $content.="Datum (dd/mm/jjjj): ".ECPFactory::getForm("aanvraagplannen")->getHtml("normal", array("datum"=>"01/01/2013","submit"=>"Plannen"))
                     ."</div>";
 
-
-            $this->title = "Overleg bewerken";
+            $script = ECPFactory::getForm("aanvraagplannen")->getScript("/listelfinal/ecareplan/overleg/aanvraagplannen/{$data[0]['id']}", array("title" => "Plannen...",
+            "action" => "Bezig met plannen...",
+            "succes" => "Het overleg is nu geplanned! Je kan het nu bewerken. <br/><img src=\'/listelfinal/lib/images/flat-loader.gif\' />",
+            "fail" => "Er is iets misgegaan. Probeer opnieuw!"), "EQ.reRoute('overleg');");
+            $this->title = "Overleg plannen";
             $this->content = $content;
             $this->script = $script;
             $this->export();

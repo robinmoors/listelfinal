@@ -16,7 +16,7 @@ ecpimport("database.Overlegbasis", "class");
 class OverlegGewoon extends Overlegbasis{
     
 }
-
+/*
 class OverlegMenos extends Overlegbasis{
     use OverlegOmbTrait{        
     OverlegOmbTrait::assignByHash as assignByHashOmb;
@@ -26,6 +26,7 @@ class OverlegMenos extends Overlegbasis{
     }
     
 }
+ */
 
 /*
 class OverlegLok extends Overlegbasis{

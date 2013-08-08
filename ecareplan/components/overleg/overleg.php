@@ -75,9 +75,11 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                     
                     $this->view->viewOverlegList($aanvraag);
                 }
-                else
-                    $this->view->viewAanvraagOverleg($aanvraag);
+                else{
+                    $formmodel->getForm("aanvraag");
+                    $this->view->viewOverlegAanvraag($aanvraag);
                     //$this->view->editOverleg($aanvraag, $formmodel->getForm("edit")); //maar 1 overleg dus dat ook bewerken...
+                }
             }
         }else {
             $this->std_command();
@@ -146,12 +148,38 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                         ecpexit('{"succes":"negative","message":"Oei het loopt even mis!<br/>Onze database kon de aanvraag niet verwerken.<br/>Probeer opnieuw of neem contact op met de beheerder."}');
                     }
                 }else{
-                    echo $session->getState();
+                    ecpexit('{"succes":"negative","reason":"signout","message":"U bent niet aangemeld!<br/>De server kon bijgevolg je aanvraag niet uitvoeren.."}');
                 }
             }else {
-                echo '{"succes":"negative","message":"Oei het loopt even mis!<br/>De server ontving geen waarden van het formulier..."}';
+                echo '{"succes":"negative","message":"Oei het loopt even mis!<br/>De server onbegreep niet wat je wilde doorsturen.."}';
                 ecpexit();
             }
+        }
+    }
+    
+    public function aanvraagplannen(){
+        //we hebben de code nodig en niet de ID dus eerst omzetten!!
+        if(array_key_exists("datum", $_POST)){
+            $session = ECPFactory::getSession();
+                if($session->isActive()){
+                    ecpimport("components.overleg.base.overlegform");
+                    $formmodel = new ECP_Comp_OverlegForm();
+                    $aanvraag = $this->model->getOverlegAanvraag($this->vars[0],true);
+                    $formmodel->getForm("aanvraag");
+                    $error[] = ECPFactory::getForm("aanvraagoverleg")->smartInsert($_POST)->validate();
+                    if($error[0]){
+                        //de waarde = 1 dus validatie was goed :)
+                        //dan gaan we de aanvraag omzetten naar een overleg!! 
+                        $this->model->setAanvraagToOverleg($aanvraag,  ECPFactory::getForm("aanvraagoverleg")->datum->value);
+                        ecpexit('{"succes":"positive","message":"De opgegeven waarde was fout!"}');
+                    }else{
+                        ecpexit('{"succes":"negative","message":"De opgegeven waarde was fout!","error":"datum"}');
+                    }
+                }else{
+                    ecpexit('{"succes":"negative","reason":"signout","message":"U bent niet aangemeld!<br/>De server kon bijgevolg je aanvraag niet uitvoeren.."}');
+                }
+        }else{
+            ecpexit('{"succes":"negative","message":"Oei het loopt even mis!<br/>De server begreep niet wat je wilde doorsturen.."}');
         }
     }
 

@@ -23,6 +23,7 @@ class ECP_Comp_OverlegForm implements ECP_OverlegObservable{
     private $newcreated = false;
     
     //overleg bewerken
+    private $aanvraagoverleg = null; //overleg plannen (overgang aanvraag naar overleg..)
     private $basisgegevens = null; //tabblad basisgegevens
     //private $teamoverleg = null; //tabblad teamoverleg
     private $attestbijlagen = null;
@@ -91,6 +92,10 @@ class ECP_Comp_OverlegForm implements ECP_OverlegObservable{
         $this->setState("newoverleg.end");
     }
     
+    private function createAanvraagOverleg(){
+        $this->aanvraagoverleg = ECPFactory::getForm("aanvraagplannen")->addField(new ECP_FormObj_Date("datum"))->addField(new ECP_FormObj_Button("Plannen"));
+    }
+    
     private function createEditOverleg(){
         $this->setState("editoverleg.start");
         $this->basisgegevens = ECPFactory::getForm("basisgegevens")->addField(new ECP_FormObj_Radio("locatie",array("0"=>"Bij de pati&euml;nt huis","1"=>"Elders")));
@@ -153,6 +158,9 @@ class ECP_Comp_OverlegForm implements ECP_OverlegObservable{
                 $this->purposeform,$this->requestorform);
                 break;
             case "select": return $this->selectform;
+                break;
+            case "aanvraag": $this->createAanvraagOverleg();
+                return $this->aanvraagoverleg;
                 break;
             default: return null;
         }
