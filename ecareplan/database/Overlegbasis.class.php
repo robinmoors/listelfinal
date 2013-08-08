@@ -9,7 +9,7 @@ include_once 'util/DSC.class.php';
  * @version 1.107
  * @package entity
  */
-abstract class Overlegbasis extends Db2PhpEntityBase implements Db2PhpEntityModificationTracking {
+class Overlegbasis extends Db2PhpEntityBase implements Db2PhpEntityModificationTracking {
 	private static $CLASS_NAME='Overlegbasis';
 	const SQL_IDENTIFIER_QUOTE='`';
 	const SQL_TABLE_NAME='overlegbasis';
@@ -990,7 +990,8 @@ abstract class Overlegbasis extends Db2PhpEntityBase implements Db2PhpEntityModi
 	public static function fromExecutedStatement(PDOStatement $stmt) {
 		$resultInstances=array();
 		while($result=$stmt->fetch(PDO::FETCH_ASSOC)) {
-			$o=new Overlegbasis();
+                    $o = new OverlegGewoon();
+			//$o=new Overlegbasis();
 			$o->assignByHash($result);
 			$o->notifyPristine();
 			$resultInstances[]=$o;
@@ -1065,7 +1066,7 @@ abstract class Overlegbasis extends Db2PhpEntityBase implements Db2PhpEntityModi
 			$filter=new DFCAggregate($filter, $and);
 		}
 		if (0==count($filter)) {
-			throw new InvalidArgumentException('refusing to delete without filter'); // just comment out this line if you are brave
+			//throw new InvalidArgumentException('refusing to delete without filter'); // just comment out this line if you are brave
 		}
 		$sql='DELETE FROM `overlegbasis`'
 		. self::buildSqlWhere($filter, $and, false, true);
@@ -1142,7 +1143,8 @@ abstract class Overlegbasis extends Db2PhpEntityBase implements Db2PhpEntityModi
 		if(!$result) {
 			return null;
 		}
-		$o=new Overlegbasis();
+                $o = new OverlegGewoon();
+		//$o=new Overlegbasis();
 		$o->assignByHash($result);
 		$o->notifyPristine();
 		return $o;
@@ -1185,6 +1187,7 @@ abstract class Overlegbasis extends Db2PhpEntityBase implements Db2PhpEntityModi
 	 * @return mixed
 	 */
 	public function insertIntoDatabase(PDO $db) {
+            echo '------------ INSERT basis -----------';
 		if (null===$this->getId()) {
 			$stmt=self::prepareStatement($db,self::SQL_INSERT_AUTOINCREMENT);
 			$stmt->bindValue(1,$this->getPatientCode());
@@ -1564,10 +1567,11 @@ abstract class Overlegbasis extends Db2PhpEntityBase implements Db2PhpEntityModi
 	 * @return Overlegbasis
 	 */
 	public static function fromDOMElement(DOMElement $node) {
-		$o=new Overlegbasis();
-		$o->assignByHash(self::domNodeToHash($node, self::$FIELD_NAMES, self::$DEFAULT_VALUES, self::$FIELD_TYPES));
-			$o->notifyPristine();
-		return $o;
+            $o = new OverlegGewoon();	
+            //$o=new Overlegbasis();
+            $o->assignByHash(self::domNodeToHash($node, self::$FIELD_NAMES, self::$DEFAULT_VALUES, self::$FIELD_TYPES));
+            $o->notifyPristine();
+            return $o;
 	}
 
 	/**

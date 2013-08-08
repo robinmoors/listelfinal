@@ -1858,12 +1858,12 @@ DEFAULT CHARACTER SET = utf8;
 DROP TABLE IF EXISTS `listel5`.`overlegomb` ;
 
 CREATE  TABLE IF NOT EXISTS `listel5`.`overlegomb` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT ,
+  `uid` INT(11) NOT NULL AUTO_INCREMENT ,
   `overleg_id` INT(11) NOT NULL ,
   `omb_factuur` VARCHAR(20) NULL DEFAULT NULL ,
   `omb_actief` INT(11) NULL DEFAULT '0' ,
   `omb_rangorde` INT(11) NULL DEFAULT '0' ,
-  PRIMARY KEY (`id`) ,
+  PRIMARY KEY (`uid`) ,
   INDEX `overleg_idx` (`overleg_id` ASC) ,
   CONSTRAINT `FK_overlegomb_overleg_id`
     FOREIGN KEY (`overleg_id` )

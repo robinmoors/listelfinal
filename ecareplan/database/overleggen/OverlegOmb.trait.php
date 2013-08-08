@@ -1,33 +1,33 @@
 <?php
 trait OverlegOmbTrait {
-	private $id;
+	private $uid;
 	private $overlegId;
 	private $ombFactuur;
 	private $ombActief;
 	private $ombRangorde;
 
 	/**
-	 * set value for id 
+	 * set value for uid 
 	 *
 	 * type:INT,size:10,default:null,primary,unique,autoincrement
 	 *
-	 * @param mixed $id
+	 * @param mixed $uid
 	 * @return Overlegomb
 	 */
-	public function &setId($id) {
-		$this->id=$id;
+	public function &setUid($uid) {
+		$this->uid=$uid;
 		return $this;
 	}
 
 	/**
-	 * get value for id 
+	 * get value for uid 
 	 *
 	 * type:INT,size:10,default:null,primary,unique,autoincrement
 	 *
 	 * @return mixed
 	 */
-	public function getId() {
-		return $this->id;
+	public function getUid() {
+		return $this->uid;
 	}
 
 	/**
@@ -133,7 +133,7 @@ trait OverlegOmbTrait {
 	 */
 	public function toArray() {
 		return array(
-			'id'=>$this->getId(),
+			'uid'=>$this->getUid(),
 			'overleg_id'=>$this->getOverlegId(),
 			'omb_factuur'=>$this->getOmbFactuur(),
 			'omb_actief'=>$this->getOmbActief(),
@@ -141,37 +141,51 @@ trait OverlegOmbTrait {
 	}
         
         public function assignByHash($result){
-            $this->setId($result['id']);
+            parent::assignByHash($result);
+            $this->setUid($result['uid']);
             $this->setOverlegId($result['overleg_id']);
             $this->setOmbFactuur($result['omb_factuur']);
             $this->setOmbActief($result['omb_actief']);
             $this->setOmbRangorde($result['omb_rangorde']);
         }
         
-        public function getFieldNames(){
-            return array(1=>'id',
+        public static function getFieldNames(){
+            return array(1=>'uid',
                 2=>'overleg_id',
                 3=>'omb_factuur',
                 4=>'omb_actief',
                 5=>'omb_rangorde');
         }
         
-        public function insertIntoDatabase(PDO $db){
+        public function insertIntoDatabaseOmb(PDO $db, $parent){
+            if($parent) {
+                parent::insertIntoDatabase($db);
+            }
+            $uid = $this->getUid();
             $overlegid  = $this->getOverlegId();
             $ombfactuur = $this->getOmbFactuur();
             $ombactief = $this->getOmbActief();
             $ombrangorde = $this->getOmbRangorde();
             
             $query = 'INSERT INTO `overlegomb`
-                SET `id`= :id, `overleg_id`= :overleg_id, `omb_factuur`= :omb_factuur, `omb_actief`= :omb_actief, `omb_rangorde`= :omb_rangorde';
+                SET `uid` = :uid, `overleg_id`= :overleg_id, `omb_factuur`= :omb_factuur, `omb_actief`= :omb_actief, `omb_rangorde`= :omb_rangorde';
             
             try{
                 $statement= $db->prepare($query);
+                $statement->bindValue(':uid',$uid);
                 $statement->bindValue(':overleg_id',$overlegid);
                 $statement->bindValue(':omb_factuur',$ombfactuur);
                 $statement->bindValue(':omb_actief',$ombactief);
                 $statement->bindValue(':omb_rangorde',$ombrangorde);
                 $affected = $statement->execute();
+                if (false===$affected) {
+			$statement->closeCursor();
+			throw new Exception($statement->errorCode() . ':' . var_export($statement->errorInfo(), true), 0);
+		}
+		$lastInsertId=$db->lastInsertId();
+		if (false!==$lastInsertId) {
+			$this->setId($lastInsertId);
+		}
                 $statement->closeCursor();
             } catch (PDOException $e) {
                 $error_messsage = $e->getMessage();
@@ -180,8 +194,11 @@ trait OverlegOmbTrait {
             return $affected;
         }
         
-        public function updateToDatabase(PDO $db){
-            $id = $this->getId();
+        public function updateToDatabaseOmb(PDO $db, $parent){
+            if($parent) {
+                parent::updateToDatabase($db);
+            }
+            $uid = $this->getUid();
             $overlegid  = $this->getOverlegId();
             $ombfactuur = $this->getOmbFactuur();
             $ombactief = $this->getOmbActief();
@@ -189,15 +206,24 @@ trait OverlegOmbTrait {
             
             $query = 'UPDATE `overlegomb` 
                 SET `overleg_id`= :overleg_id,`omb_factuur`= :omb_factuur,`omb_actief`= :omb_actief,`omb_rangorde`= :omb_rangorde 
-                WHERE `id` = :id';
+                WHERE `uid` = :uid';
             
             try{
                 $statement= $db->prepare($query);
+                $statement->bindValue(':uid',$uid);
                 $statement->bindValue(':overleg_id',$overlegid);
                 $statement->bindValue(':omb_factuur',$ombfactuur);
                 $statement->bindValue(':omb_actief',$ombactief);
                 $statement->bindValue(':omb_rangorde',$ombrangorde);
                 $affected = $statement->execute();
+                if (false===$affected) {
+			$statement->closeCursor();
+			throw new Exception($statement->errorCode() . ':' . var_export($statement->errorInfo(), true), 0);
+		}
+		$lastInsertId=$db->lastInsertId();
+		if (false!==$lastInsertId) {
+			$this->setId($lastInsertId);
+		}
                 $statement->closeCursor();
             } catch (PDOException $e) {
                 $error_messsage = $e->getMessage();
@@ -205,16 +231,27 @@ trait OverlegOmbTrait {
             }
         }
             
-        public function deleteFromDatabase(PDO $db){
-            $id = $this->getId();
+        public function deleteFromDatabaseOmb(PDO $db, $parent){
+            
+            $uid = $this->getUid();
+           
+            echo "---------- DELETE from db omb id: $uid ---------\n";
             $query = 'DELETE FROM `overlegomb` 
-            WHERE `id`= :id';
+            WHERE `uid`= :uid';
             try{
                 $statement=$db->prepare($query);
-                $statement->bindValue(':id',$id);
+                $statement->bindValue(':uid',$uid);
                 $statement->execute();
-                $valid = ($statement->rowCount() >=1);
+                if (false===$affected) {
+			$stmt->closeCursor();
+			throw new Exception($stmt->errorCode() . ':' . var_export($stmt->errorInfo(), true), 0);
+		}
                 $statement->closeCursor();
+                
+                if($parent) {
+                    parent::deleteFromDatabase($db);
+                }
+            
             } catch (PDOException $e){
                 $error_message = $e->getMessage();
                 //display
@@ -222,14 +259,14 @@ trait OverlegOmbTrait {
             return $valid;
         }
         
-        public function findById(PDO $db){
-            $id = $this->getId();
-            $query = 'SELECT `id`, `overleg_id`, `omb_factuur`, `omb_actief`, `omb_rangorde` 
+        public static function findById(PDO $db, $id){
+            echo '--------------- find by id ------------';
+            $query = 'SELECT `uid`, `overleg_id`, `omb_factuur`, `omb_actief`, `omb_rangorde` 
                 FROM `overlegomb` 
-                WHERE id= :id';
+                WHERE `uid`= :uid';
             
             $statement = $db->prepare($query);
-            $statement->bindValue(':id', $id);
+            $statement->bindValue(':uid', $id);
             $affected= $statement->execute();
             if (false===$affected) {
                     $statement->closeCursor();			
@@ -239,22 +276,25 @@ trait OverlegOmbTrait {
             if(!$result) {
                     return null;
             }
-            return toArray($result);
+            $omb = new OverlegMenos();
+            $omb->assignByHash($result);
+            return $omb;
         }
         
-        public function findByOverleg(PDO $db){
-            $overlegid = $this->getOverlegId();
+        public static function findByOverleg(PDO $db,$id){
             $query = 'SELECT `id`, `overleg_id`, `omb_factuur`, `omb_actief`, `omb_rangorde` 
                 FROM `overlegomb` 
                 WHERE overleg_id= :overleg_id';
             
             $statement = $db->prepare($query);
-            $statement->bindValue(':overleg_id', $overlegid);
+            $statement->bindValue(':overleg_id', $id);
             $statement->execute();
             
             $resultInstances=array();
             while($result=$statement->fetch(PDO::FETCH_ASSOC)) {
-                $resultInstances[]=toArray($result);
+                $omb = new OverlegMenos();
+                $omb->assignByHashOmb($result);
+                $resultInstances[] = $omb;
             }
             $statement->closeCursor();
             return $resultInstances;

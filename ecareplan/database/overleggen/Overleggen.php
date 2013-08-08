@@ -18,7 +18,13 @@ class OverlegGewoon extends Overlegbasis{
 }
 
 class OverlegMenos extends Overlegbasis{
-    use OverlegOmbTrait;
+    use OverlegOmbTrait{        
+    OverlegOmbTrait::assignByHash as assignByHashOmb;
+    OverlegOmbTrait::findById as findByIdOmb;
+    OverlegOmbTrait::getFieldNames as getFieldNamesOmb;
+    OverlegOmbTrait::toArray as toArrayOmb;
+    }
+    
 }
 
 /*
