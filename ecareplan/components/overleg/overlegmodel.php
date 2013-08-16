@@ -149,6 +149,42 @@ class ECP_Comp_OverlegModel {
         }
     }
     
+    public function getOverlegByDatum($datum,$obj=false){
+        if($datum){
+            self::$db = ECPFactory::getPDO("Overlegbasis");
+            ecpimport("database.overleggen.overleggen");
+            $overleg = new OverlegGewoon();
+            $overleg->setDatum($datum);
+            $results = OverlegGewoon::findByExample(self::$db, $overleg);
+            if(empty($results)){
+                return false;
+            }else{
+                if($obj) return $results[0];
+                else return self::resultToArray($results, OverlegGewoon::getFieldNames());
+            }
+        }else{
+            return null;
+        }
+    }
+    
+    public function getOuderOverleg($datum,$obj=false){
+        if($datum){
+            self::$db = ECPFactory::getPDO("Overlegbasis");
+            ecpimport("database.overleggen.overleggen");
+            $overleg = new OverlegGewoon();
+            $overleg->setDatum($datum);
+            $results = OverlegGewoon::findByExample(self::$db, $overleg); //TODO hier een filter die zegt dat datum ouder moet zijn (nu is die = en niet <)
+            if(empty($results)){
+                return false;
+            }else{
+                if($obj) return $results[0];
+                else return self::resultToArray($results, OverlegGewoon::getFieldNames());
+            }
+        }else{
+            return null;
+        }
+    }
+    
     private static function queryToArray($mysqlresult){
          for($i=0; $i<$mysqlresult->getRows(); $i++){
             $data[$i] = $mysqlresult->nextResult()->get();
@@ -189,16 +225,26 @@ class ECP_Comp_OverlegModel {
     
     public function setAanvraagToOverleg(AanvraagOverleg $aanvraag,$datum){
         self::$db = ECPFactory::getPDO("overlegbasis");
+        //alle soorten overleggen includen...
         ecpimport("database.overleggen.overleggen");
+        //we beginnen alvast met de basisinformatie
         $basis = new OverlegGewoon();
+        //daar kunnen we de patientcode overnemen vanuit de aanvraag en ook de datum invullen van het overleg
+        //de status eveneens instellen
         $basis->setPatientCode($aanvraag->getPatientCode())->setDatum($datum);
         
+        
+        
+        //de aanvraag mag geupdated worden met status naar overleg...
+        //en we geven ook mee welk overleg hiermee gekoppeld is...
         $aanvraag->setStatus("overleg")->setRedenStatus("overleg gepland");
         try{
             $update = $aanvraag->updateToDatabase(self::$db);
             return true;
         }catch(Exception $e){
-            ecpexit('{"succes":"negative","message":"Er liep iets grandioos fout!<br/>'.htmlentities($e->getMessage()).'"}');
+            ecpexit('{"succes":"negative","message":"Het overleg is gepland maar...<br/>
+                Er liep iets grandioos fout bij het updaten van de aanvraag!<br/>
+                De aanvraag zal bijgevolg niet gekoppeld zijn aan het nieuwe overleg.<br>Fout:'.htmlentities($e->getMessage()).'"}');
         }
     }
     

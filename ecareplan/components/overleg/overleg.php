@@ -162,23 +162,63 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
         if(array_key_exists("datum", $_POST)){
             $session = ECPFactory::getSession();
                 if($session->isActive()){
+                    //sessie is ok
                     ecpimport("components.overleg.base.overlegform");
                     $formmodel = new ECP_Comp_OverlegForm();
                     $aanvraag = $this->model->getOverlegAanvraag($this->vars[0],true);
+                    //we hebben het formulier en de gegevens vd aanvraag...
                     $formmodel->getForm("aanvraag");
                     $error[] = ECPFactory::getForm("aanvraagoverleg")->smartInsert($_POST)->validate();
                     if($error[0]){
                         //de waarde = 1 dus validatie was goed :)
+                        //Nu kijken of er al overleggen bestaan (voor gegevens) en of er een overleg ook op die datum staat (wat niet mag)
+                        $datum = ECPFactory::getForm("aanvraagoverleg")->datum->value;
+                        if($this->model->getOverlegByDatum($datum,true)){
+                            //we hadden bij de test het object gevraagd = sneller resultaat omdat er geen omzetting gebeurd (terzijde)
+                            
+                            //er is een overleg gevonden op de datum! dat mag niet..
+                            ecpexit('{"succes":"negative","message":"Er bestaat al een overleg op deze datum<br/>Elke patient kan maar 1 overleg per dag hebben!"');
+                        }else{
+                            //geen overleg op die datum, we gaan verder...
+                            //zijn er oudere overleggen? zoja, neem er 1tje..
+                            $oude = $this->model->getOuderOverleg($datum,true);
+                            $extra = null;
+                            if($oude){
+                                //waardes kijken of die bestaan en dan instellen
+                                $extra = array();
+                                $extra['ContactHvl'] = $extra->getContactHvl() ? $extra->getContactHvl() : false;
+                                $extra['ContactMz'] = $extra->getContactHvl() ? $extra->getContactHvl() : false;
+                               // $extra['psy_algemeen'] = $extra->getPsyAlgemeen() ? $extra->getPsyAlgemeen() : false;
+                               // $extra['psy_doelstellingen'] = $extra->getPsyDoelstellingen() ? $extra->getPsyDoelstellingen : false;
+                               // dient voor psy!
+                            }
+                            //TPRechten
+                            
+                            
+                            //toegewezen genre en id bepalen
+                            
+                            //problematiek instellen
+                            
+                            //overleg aanmaken
+                            
+                            //patient updaten
+                            
+                            //huidige betrokkenen ophalen en tp plan aanmaken
+                            
+                        }
                         //dan gaan we de aanvraag omzetten naar een overleg!! 
-                        $this->model->setAanvraagToOverleg($aanvraag,  ECPFactory::getForm("aanvraagoverleg")->datum->value);
+                        $this->model->setAanvraagToOverleg($aanvraag, $datum);
                         ecpexit('{"succes":"positive","message":"De opgegeven waarde was fout!"}');
                     }else{
+                        //validatie niet ok..
                         ecpexit('{"succes":"negative","message":"De opgegeven waarde was fout!","error":"datum"}');
                     }
                 }else{
+                    //sessie niet ok..
                     ecpexit('{"succes":"negative","reason":"signout","message":"U bent niet aangemeld!<br/>De server kon bijgevolg je aanvraag niet uitvoeren.."}');
                 }
         }else{
+            //post waardes niet ok.. als je braafjes alles doet kan dat normaal ook niet..
             ecpexit('{"succes":"negative","message":"Oei het loopt even mis!<br/>De server begreep niet wat je wilde doorsturen.."}');
         }
     }
