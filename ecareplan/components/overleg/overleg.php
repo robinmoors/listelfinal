@@ -107,7 +107,7 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
             if (!is_null($this->vars[0])) { //patientnummer opgeven
                 $pat_id = $this->vars[0];
                 //patient met overleggen ophalen
-                ecpimport("components.overleg.patient.model"); // het patientenmodel ophalen...
+                ecpimport("components.overleg.patient.patientmodel"); // het patientenmodel ophalen...
                 $patmod = new ECP_Comp_Overleg_PatientModel($this->user->getUserId());
                 $patient = $this->model->getOverlegByPatientId($pat_id);
                 if ($patient == null) {
@@ -137,7 +137,7 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                     $patient = $this->model->getOverlegByPatientId($_POST['patid']);
                     if ($patient == null) {
                         //patient had geen overleggen... Dan maar alleen patient opgeven
-                        ecpimport("components.overleg.patient.model"); // het patientenmodel ophalen...
+                        ecpimport("components.overleg.patient.patientmodel"); // het patientenmodel ophalen...
                         $patmod = new ECP_Comp_Overleg_PatientModel($this->user->getUserId());
                         $patient = $patmod->getPatientById($_POST['patid']);
                     }
@@ -160,7 +160,7 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                         //print_r($report);
                     $error = $formmodel->validateNewOverleg($report);
                         //print_r($error);
-                    ecpimport("components.overleg.aanvraag.model");
+                    ecpimport("components.overleg.aanvraag.aanvraagmodel");
                     $aanmod = new ECP_Comp_Overleg_AanvraagModel($_POST['patid']);
                     if($aanmod->setAanvraag($patient, $values)){
                         ecpexit('{"succes":"positive","message":"Het overleg werd aangevraagd!<br/>Het systeem keert terug naar de overleglijst..."}');
@@ -189,7 +189,7 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                     //sessie is ok
                     ecpimport("components.overleg.base.overlegform");
                     $formmodel = new ECP_Comp_OverlegForm();
-                    ecpimport("components.overleg.aanvraag.model");
+                    ecpimport("components.overleg.aanvraag.aanvraagmodel");
                     $aanmod = new ECP_Comp_Overleg_AanvraagModel(0);
                     $aanvraag = $aanmod->getAanvraagById($this->vars[0],true);
                     //we hebben het formulier en de gegevens vd aanvraag...
