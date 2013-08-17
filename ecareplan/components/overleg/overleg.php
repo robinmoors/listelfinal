@@ -20,10 +20,14 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
     protected $user = null;
 
     public function __CONSTRUCT() {
-        ecpimport("components.overleg.overlegobserver"); //observer interface
-        ecpimport("components.overleg.overlegobservable"); //observable (subject) interface
-        ecpimport("components.overleg.overlegmodel"); //std model
+        ecpimport("components.overleg.base.overlegobserver"); //observer interface
+        ecpimport("components.overleg.base.overlegobservable"); //observable (subject) interface
+        ecpimport("components.overleg.base.model"); //basis model
+        ecpimport("components.overleg.base.view"); //basis view (observable)
+        //onderstaand moet op termijn verdwijnen!
+        ecpimport("components.overleg.overlegmodel"); //overleg model
         ecpimport("components.overleg.overlegview"); //std view
+        //bovenstaand moet op termijn verdwijnen!
         $this->action = "std_command";
         $this->app = ECPFactory::getApp(); //haal de app op om template te gaan veranderen
         $this->user = $this->app->getUser(); //via de app de user ophalen zodat we zeker de huidige user hebben :)
@@ -32,7 +36,7 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
     }
 
     public function command($command) {
-        if ($command == "command" || !is_callable(array(&$this, $command))) {
+        if ($command == "command" || !is_callable(array(&$this, $command)) || $command == "command") {
             $command = "command_error";
         }
         $this->action = $command;
@@ -60,6 +64,12 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
         $this->view->viewList($aanvragen);
     }
 
+    /**
+     * Bewerken van een aanvraag of overleg ~ TODO ONDERSCHEID OVERLEG ? AANVRAAG ? ~
+     * @url http://listel.be/ecareplan/overleg/bewerk/
+     * 
+     */
+    
     public function bewerk() {
         if (!is_null($this->vars[0])) {
             ecpimport("components.overleg.base.overlegform");
@@ -85,7 +95,11 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
             $this->std_command();
         }
     }
-
+    
+    /**
+     * Nieuw overleg gaan beginnen = Aanvraag starten!
+     * @url http://listel.be/ecareplan/overleg/nieuw/
+     */
     public function nieuw() {
         ecpimport("components.overleg.base.overlegform");
         $formmodel = new ECP_Comp_OverlegForm();
@@ -93,13 +107,15 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
             if (!is_null($this->vars[0])) { //patientnummer opgeven
                 $pat_id = $this->vars[0];
                 //patient met overleggen ophalen
+                ecpimport("components.overleg.patient.model"); // het patientenmodel ophalen...
+                $patmod = new ECP_Comp_Overleg_PatientModel($this->user->getUserId());
                 $patient = $this->model->getOverlegByPatientId($pat_id);
                 if ($patient == null) {
                     //patient had geen overleggen... Dan maar alleen patient opgeven
-                    $patient = $this->model->getPatientById($pat_id);
+                    $patient = $patmod->getPatientById($pat_id);
                 }
                 //de toegewezen OC ophalen en bij data patient steken...
-                $patient['toegewezen'] = $this->model->getPatientToewijzing($pat_id);
+                $patient['toegewezen'] = $patmod->getPatientToewijzing($pat_id);
                 //regionaal dienstencentra ophalen (RDC)
                 $formmodel->updateRDCList($this->model->getRDC());
                 //zorgaanbieders ophalen (ZA)
@@ -121,7 +137,9 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                     $patient = $this->model->getOverlegByPatientId($_POST['patid']);
                     if ($patient == null) {
                         //patient had geen overleggen... Dan maar alleen patient opgeven
-                        $patient = $this->model->getPatientById($_POST['patid']);
+                        ecpimport("components.overleg.patient.model"); // het patientenmodel ophalen...
+                        $patmod = new ECP_Comp_Overleg_PatientModel($this->user->getUserId());
+                        $patient = $patmod->getPatientById($_POST['patid']);
                     }
                     if($patient == null) {
                         ecpexit('{"succes":"negative","message":"Oei het loopt even mis!<br/>De server kon de patient niet vinden..."}');
@@ -142,7 +160,9 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                         //print_r($report);
                     $error = $formmodel->validateNewOverleg($report);
                         //print_r($error);
-                    if($this->model->setAanvraag($_POST['patid'],$values)){
+                    ecpimport("components.overleg.aanvraag.model");
+                    $aanmod = new ECP_Comp_Overleg_AanvraagModel($_POST['patid']);
+                    if($aanmod->setAanvraag($patient, $values)){
                         ecpexit('{"succes":"positive","message":"Het overleg werd aangevraagd!<br/>Het systeem keert terug naar de overleglijst..."}');
                     }else{
                         ecpexit('{"succes":"negative","message":"Oei het loopt even mis!<br/>Onze database kon de aanvraag niet verwerken.<br/>Probeer opnieuw of neem contact op met de beheerder."}');
@@ -157,6 +177,10 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
         }
     }
     
+    /**
+     * Het overleg plannen = aanvraag omzetten naar een overleg (proberen toch..)
+     * Dit is een POST-only commando!
+     */
     public function aanvraagplannen(){
         //we hebben de code nodig en niet de ID dus eerst omzetten!!
         if(array_key_exists("datum", $_POST)){
@@ -165,7 +189,9 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                     //sessie is ok
                     ecpimport("components.overleg.base.overlegform");
                     $formmodel = new ECP_Comp_OverlegForm();
-                    $aanvraag = $this->model->getOverlegAanvraag($this->vars[0],true);
+                    ecpimport("components.overleg.aanvraag.model");
+                    $aanmod = new ECP_Comp_Overleg_AanvraagModel(0);
+                    $aanvraag = $aanmod->getAanvraagById($this->vars[0],true);
                     //we hebben het formulier en de gegevens vd aanvraag...
                     $formmodel->getForm("aanvraag");
                     $error[] = ECPFactory::getForm("aanvraagoverleg")->smartInsert($_POST)->validate();
@@ -207,7 +233,7 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                             
                         }
                         //dan gaan we de aanvraag omzetten naar een overleg!! 
-                        $this->model->setAanvraagToOverleg($aanvraag, $datum);
+                        $aanmod->setAanvraagToOverleg($aanvraag, $datum);
                         ecpexit('{"succes":"positive","message":"De opgegeven waarde was fout!"}');
                     }else{
                         //validatie niet ok..
