@@ -5,7 +5,6 @@ trait OverlegOmbTrait {
 	private $ombFactuur;
 	private $ombActief;
 	private $ombRangorde;
-
 	/**
 	 * set value for uid 
 	 *
@@ -157,10 +156,7 @@ trait OverlegOmbTrait {
                 5=>'omb_rangorde');
         }
         
-        public function insertIntoDatabaseOmb(PDO $db, $parent){
-            if($parent) {
-                parent::insertIntoDatabase($db);
-            }
+        public function insertIntoDatabaseOmb(PDO $db){
             $uid = $this->getUid();
             $overlegid  = $this->getOverlegId();
             $ombfactuur = $this->getOmbFactuur();
@@ -184,7 +180,7 @@ trait OverlegOmbTrait {
 		}
 		$lastInsertId=$db->lastInsertId();
 		if (false!==$lastInsertId) {
-			$this->setId($lastInsertId);
+			$this->setUid($lastInsertId);
 		}
                 $statement->closeCursor();
             } catch (PDOException $e) {
@@ -195,6 +191,7 @@ trait OverlegOmbTrait {
         }
         
         public function updateToDatabaseOmb(PDO $db, $parent){
+            echo '------------ UPDATE OMB -----------------';
             if($parent) {
                 parent::updateToDatabase($db);
             }
@@ -222,7 +219,7 @@ trait OverlegOmbTrait {
 		}
 		$lastInsertId=$db->lastInsertId();
 		if (false!==$lastInsertId) {
-			$this->setId($lastInsertId);
+			$this->setUid($lastInsertId);
 		}
                 $statement->closeCursor();
             } catch (PDOException $e) {
@@ -232,10 +229,7 @@ trait OverlegOmbTrait {
         }
             
         public function deleteFromDatabaseOmb(PDO $db, $parent){
-            
             $uid = $this->getUid();
-           
-            echo "---------- DELETE from db omb id: $uid ---------\n";
             $query = 'DELETE FROM `overlegomb` 
             WHERE `uid`= :uid';
             try{
@@ -247,11 +241,9 @@ trait OverlegOmbTrait {
 			throw new Exception($stmt->errorCode() . ':' . var_export($stmt->errorInfo(), true), 0);
 		}
                 $statement->closeCursor();
-                
                 if($parent) {
                     parent::deleteFromDatabase($db);
                 }
-            
             } catch (PDOException $e){
                 $error_message = $e->getMessage();
                 //display
@@ -260,7 +252,6 @@ trait OverlegOmbTrait {
         }
         
         public static function findById(PDO $db, $id){
-            echo '--------------- find by id ------------';
             $query = 'SELECT `uid`, `overleg_id`, `omb_factuur`, `omb_actief`, `omb_rangorde` 
                 FROM `overlegomb` 
                 WHERE `uid`= :uid';
@@ -282,22 +273,27 @@ trait OverlegOmbTrait {
         }
         
         public static function findByOverleg(PDO $db,$id){
-            $query = 'SELECT `id`, `overleg_id`, `omb_factuur`, `omb_actief`, `omb_rangorde` 
+            $query = 'SELECT `uid`, `overleg_id`, `omb_factuur`, `omb_actief`, `omb_rangorde` 
                 FROM `overlegomb` 
-                WHERE overleg_id= :overleg_id';
+                WHERE `overleg_id` = :overleg_id';
             
             $statement = $db->prepare($query);
             $statement->bindValue(':overleg_id', $id);
             $statement->execute();
             
-            $resultInstances=array();
-            while($result=$statement->fetch(PDO::FETCH_ASSOC)) {
-                $omb = new OverlegMenos();
-                $omb->assignByHashOmb($result);
-                $resultInstances[] = $omb;
+            if (false===$affected) {
+                    $statement->closeCursor();	
+                    throw new Exception($statement->errorCode() . ':' . var_export($statement->errorInfo(), true), 0);
             }
+            $result = $statement->fetch();
             $statement->closeCursor();
-            return $resultInstances;
+            if(!$result) {
+                //echo '{"succes":"negative","message":"Oei het loopt even mis!<br/>We vonden geen overleg met het id"}';
+                    return null;
+            }
+            $omb = new OverlegMenos();
+            $omb->assignByHash($result);
+            return $omb;
         }
         
 }

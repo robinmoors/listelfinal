@@ -1260,7 +1260,7 @@ CREATE  TABLE IF NOT EXISTS `overlegbasis` (
   CONSTRAINT `FK_overlegbasis_omb_id`
     FOREIGN KEY (`omb_id` )
     REFERENCES `omb_registratie` (`id` )
-    ON DELETE RESTRICT
+    ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `FK_overlegbasis_patient_code`
     FOREIGN KEY (`patient_code` )

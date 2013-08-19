@@ -1187,7 +1187,6 @@ class Overlegbasis extends Db2PhpEntityBase implements Db2PhpEntityModificationT
 	 * @return mixed
 	 */
 	public function insertIntoDatabase(PDO $db) {
-            echo '------------ INSERT basis -----------';
 		if (null===$this->getId()) {
 			$stmt=self::prepareStatement($db,self::SQL_INSERT_AUTOINCREMENT);
 			$stmt->bindValue(1,$this->getPatientCode());
@@ -1257,15 +1256,16 @@ class Overlegbasis extends Db2PhpEntityBase implements Db2PhpEntityModificationT
 	 * @return mixed
 	 */
 	public function deleteFromDatabase(PDO $db) {
-		$stmt=self::prepareStatement($db,self::SQL_DELETE_PK);
-		$stmt->bindValue(1,$this->getId());
-		$affected=$stmt->execute();
-		if (false===$affected) {
-			$stmt->closeCursor();
-			throw new Exception($stmt->errorCode() . ':' . var_export($stmt->errorInfo(), true), 0);
-		}
-		$stmt->closeCursor();
-		return $affected;
+            $stmt=self::prepareStatement($db,self::SQL_DELETE_PK);
+            $stmt->bindValue(1,$this->getId());
+            echo "parent_id: $this->getId";
+            $affected=$stmt->execute();
+            if (false===$affected) {
+                    $stmt->closeCursor();
+                    throw new Exception($stmt->errorCode() . ':' . var_export($stmt->errorInfo(), true), 0);
+            }
+            $stmt->closeCursor();
+            return $affected;
 	}
 
 	/**

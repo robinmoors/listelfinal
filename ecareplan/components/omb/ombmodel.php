@@ -10,9 +10,6 @@ class ECP_Comp_OmbModel {
 
     protected $uid = 0;
     protected static $db; //db is een static object (zie factory)
-    
-    //data
-    private static $organisations = null;
 
     public function __CONSTRUCT($uid) {
         $this->uid = $uid;
@@ -62,16 +59,62 @@ class ECP_Comp_OmbModel {
         return self::resultToArray($result, OmbRegistratie::getFieldNames());
     }
     
-    public function testFunction(){
-        ecpimport("database.overleggen.Overleggen");
+    public function startOmb(){
         self::$db = ECPFactory::getPDO("Overleggen");
-        $lok = new OverlegLok();
-        $result = $lok->findByOverleg(self::$db);
-        return self::resultToArray($result,  OverlegLok::getFieldNamesLok());
+        return new OverlegMenos();
     }
     
-    public function newOmb(){
-        
+    /**
+     * Zoekt een overleg en maakt er een nieuw overlegMenos van
+     * @param type $overlegId
+     * @return type OverlegMenos
+     */
+    private function findByIdAndConvert($overlegId){
+        self::$db = ECPFactory::getPDO("Overleggen");
+        $result = Overlegbasis::findById(self::$db, $overlegId); 
+        $array = $result->toHash();
+
+        $omb = new OverlegMenos();
+        $omb->assignByHash($array);
+        return $omb;
     }
+    
+    /**
+     * Zoekt een overleg en maakt een nieuw overlegMenos met de bijgevoegde parameters
+     * @param type $overlegId
+     * @param type $ombFactuur
+     * @param type $ombActief
+     * @param type $ombRangorde
+     * @return type OverlegMenos
+     */
+    public function createOmbFromOverleg($overlegId,$ombFactuur=NULL,$ombActief=NULL,$ombRangorde=NULL){
+        $omb = $this->findByIdAndConvert($overlegId);
+        if($omb){
+            $omb->setOverlegId($omb->getId())
+                ->setOmbFactuur($ombFactuur)
+                ->setOmbActief($ombActief)
+                ->setOmbRangorde($ombRangorde);
+        return $omb;
+        }
+    }
+    
+    public function getOverlegMenos($overlegId){
+        $omb = $this->findByIdAndConvert($overlegId);
+        $omb2 = OverlegMenos::findByOverleg(self::$db, $overlegId);
+        $omb->setUid($omb2->getUid())
+        ->setOverlegId($omb2->getOverlegId())
+        ->setOmbFactuur($omb2->getOmbFactuur())
+        ->setOmbActief($omb2->getOmbActief())
+        ->setOmbRangorde($omb2->getOmbRangorde());
+        return $omb;
+    }
+    
+    public function deleteOverlegMenos($overlegId,$parent){
+        $omb = $this->getOverlegMenos($overlegId);
+        if($omb){
+            $omb->deleteFromDatabaseOmb(self::$db,$parent);
+        }
+    }
+    
 }
 ?>
