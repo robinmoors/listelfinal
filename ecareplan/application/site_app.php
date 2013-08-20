@@ -74,6 +74,18 @@ class ECP_SiteApp extends ECP_App {
         $templ->give($tdata);
         $message = "";
         $errors = parent::getErrors();
+        //css bestand swappen met juiste :)
+        $sel = $this->user->getSel();
+        $head = $templ->getHeader();
+        $newstyles = array();
+        foreach($head[0] as $style){
+            if($style=="listel"){
+                $style = $sel;
+            }
+            array_push($newstyles,$style);
+        }
+        $templ->setHeader($newstyles,$head[1]);
+        
         for($i=0; $i<count($errors);$i++){
             $message.=" $i - {$errors[$i]}";
         }

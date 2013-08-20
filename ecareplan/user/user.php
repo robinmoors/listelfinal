@@ -20,6 +20,7 @@ class ECP_User extends ECP_Object implements ECP_FactoryInterface{
     private $guest;
     private $user = 0;
     private $locked = true;
+    private $sel = null;
     
     private $typeobj = null;
 
@@ -97,6 +98,30 @@ class ECP_User extends ECP_Object implements ECP_FactoryInterface{
      */
     public function getUserId(){
         return $this->getId();
+    }
+    
+    public function getSel(){
+        if($this->isGuest()){
+            $this->sel = "listel";
+        }else if(!$this->sel){
+            $gem_id = $this->user['gem_id'];
+            $db = ECPFactory::getPDO("gemeente");
+            $gem = new Gemeente();
+            $gem->setId($gem_id);
+            $result = $gem->findByExample($db, $gem);
+            if(count($result)<1){
+                $this->sel = "listel";
+            }else{
+                ecpimport("database.Sit","class");
+                $sit = $result[0]->fetchSit($db);
+                switch($sit->getNr()){
+                    case 18: $this->sel = "goal"; break;
+                    default: $this->sel = "listel";
+                        break;
+                }
+            }
+        }
+        return $this->sel;
     }
     /**
      * Tell if session is guest!
