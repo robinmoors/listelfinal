@@ -14,14 +14,20 @@
  */
 defined("ECP_AC") or die("Stop! Wat we onder de motorkap hebben zitten houden we liever verborgen.");
 
-class ECP_Template extends ECP_Object implements ECP_FactoryInterface{
+class ECP_Template extends ECP_Object implements ECP_FactoryInterface, ECP_TemplateInterface{
 
-    protected $head = '';
-    protected $body = '';
-    protected $data = array();
+    private static $head = '';
+    private static $body = '';
+    
+    protected static $styles = array();
+    protected static $scripts = array();
+    protected static $rawbody = "";
+    protected static $data = array();
+    
+    private static $state = "uninitialized";
 
     public function __construct() {
-        
+        self::$state = "constructed";
     }
 
     /**
@@ -29,10 +35,10 @@ class ECP_Template extends ECP_Object implements ECP_FactoryInterface{
      * @param array $styles (stylefiles without .css), leave blank if no styles are needed
      * @param array $scripts (javascripts withoud .js), leave blank if no scripts are needed
      */
-    protected function createHead($styles = null, $scripts = null) {
+    private function createHead($styles = null, $scripts = null) {
         $scripts = is_null($scripts) ? array("none") : (is_array($scripts) ? $scripts : array($scripts));
         $styles = is_null($styles) ? array("none") : (is_array($styles) ? $styles : array($styles));
-        $this->head = "
+        self::$head = "
 <!DOCTYPE html>
 <html lang=\"en\">
     <head>
@@ -40,19 +46,19 @@ class ECP_Template extends ECP_Object implements ECP_FactoryInterface{
         <link rel=\"shortcut icon\" href=\"/listelfinal/favicon.ico.png.ico\" />";
         if ($styles[0] != "none") {
             foreach ($styles as $style) {
-                $this->head.="<link rel=\"stylesheet\" href=\"/listelfinal/lib/css/{$style}.css\" media=\"screen\" />";
+                self::$head.="<link rel=\"stylesheet\" href=\"/listelfinal/lib/css/{$style}.css\" media=\"screen\" />";
             }
         }
-        $this->head.=" 
+        self::$head.=" 
         <script src=\"/listelfinal/lib/js/jquery.js\" type=\"text/javascript\"></script>
         ";
         if ($scripts[0] != "none") {
             foreach ($scripts as $script) {
-                $this->head.="<script src=\"/listelfinal/lib/js/{$script}.js\"></script>";
+                self::$head.="<script src=\"/listelfinal/lib/js/{$script}.js\"></script>";
             }
         }
 
-        $this->head.="
+        self::$head.="
         <script type=\"text/javascript\">
             $(document).ready(function(){
                 EQ.CPU = EQ.ajaxProcessor;
@@ -65,18 +71,20 @@ class ECP_Template extends ECP_Object implements ECP_FactoryInterface{
         <![endif]-->
     </head>
                     ";
+        $this->state = "header-ready";
     }
 
     /**
      * Creates the body-block
      * @param type $html 
      */
-    protected function createBody($html) {
-        $this->body = "
+    private function createBody($html) {
+        self::$body = "
     <body>
         $html
     </body>
 </html>";
+        self::$state = "body-ready";
     }
     
     /**
@@ -84,7 +92,7 @@ class ECP_Template extends ECP_Object implements ECP_FactoryInterface{
      * @param html $msg 
      */
     public function input($msg){
-        self::replace("message",$msg);
+        $this->replace("message",$msg);
     }
     
     /**
@@ -92,9 +100,16 @@ class ECP_Template extends ECP_Object implements ECP_FactoryInterface{
      * @param templateTextArea $needle
      * @param html $txt 
      */
-    protected function replace($needle,$txt){
-        $this->head = str_replace("{[{$needle}]}",$txt,$this->head);
-        $this->body = str_replace("{[{$needle}]}",$txt,$this->body);
+    private function replace($needle,$txt){
+        if(self::$state!=="body-ready"){
+            if(self::$state!=="header-ready"){
+                $header = $this->getHeader();
+                $this->createHead($header[0], $header[1]);
+            }
+            $this->createBody($this->getBody());
+        }
+        self::$head = str_replace("{[{$needle}]}",$txt,self::$head);
+        self::$body = str_replace("{[{$needle}]}",$txt,self::$body);
     }
     
     /**
@@ -102,8 +117,8 @@ class ECP_Template extends ECP_Object implements ECP_FactoryInterface{
      * @return html 
      */
     public function get(){
-        self::finish();  //deleting templateTextArea's wich are not filled in
-        return $this->head.$this->body;
+        $this->finish();  //deleting templateTextArea's wich are not filled in
+        return self::$head.self::$body;
     }
     /**
      * Pass the templatedata to this class.
@@ -115,20 +130,28 @@ class ECP_Template extends ECP_Object implements ECP_FactoryInterface{
             $this->addError("Fatal Error: No templatedata given in give!");
             return false;
         }else{
-            $this->data = $data;
+            self::$data = $data;
             return true;
         }
     }
     /**
      *  Verwijder alle ongebruikte templateTextArea's om een mooi template af te kunnen leveren
      */
-    protected function finish(){
+    private function finish(){
+        if(self::$state!=="finished" && self::$state!=="body-ready"){
+            if(self::$state!=="header-ready"){
+                $header = $this->getHeader();
+                $this->createHead($header[0], $header[1]);
+            }
+            $this->createBody($this->getBody());
+        }
         //replace all templateTextArea's with ""
         $tags = array("baseurl","headscript","title","bodyscript","content","content-title","content-sub-title","footer","version-name","errors","user-name","login-button");
         foreach($tags as $tag){
-            if(array_key_exists($tag, $this->data)) self::replace($tag,$this->data[$tag]);
-            else self::replace($tag,"");
+            if(array_key_exists($tag, self::$data)) self::replace($tag,self::$data[$tag]);
+            else $this->replace($tag,"");
         }
+        $this->state = "finished";
     }
     /**
      * Toon errors in template
@@ -161,6 +184,22 @@ class ECP_Template extends ECP_Object implements ECP_FactoryInterface{
             $instances[$templatefile] = &$instance;
         }
         return $instances[$templatefile];
+    }
+
+     public function getBody() {
+        return self::$rawbody;
+    }
+
+    public function getHeader() {
+        return array(self::$styles,self::$scripts);
+    }
+
+    public function setBody($html) {
+        self::$rawbody = $html;
+    }
+
+    public function setHeader($styles = array(), $scripts = array()) {
+        self::$styles = $styles; self::$scripts = $scripts;
     }
 }
 

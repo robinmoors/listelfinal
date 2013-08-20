@@ -7,11 +7,12 @@
 
 defined("ECP_AC") or die("Stop! Wat we onder de motorkap hebben zitten houden we liever verborgen.");
 
-class ECP_Template_Listel extends ECP_Template {
-
+class ECP_Template_Listel extends ECP_Template{
+    
     public function __CONSTRUCT() {
-        parent::createHead("listel","equinsi");
-        $body = "
+        parent::$scripts = array("equinsi");
+        parent::$styles = array("listel");
+        parent::$rawbody = "
  <div id='overflowbox' style='display:none;'>
     <div id='overflow'>&nbsp;</div>
     <div id='overflowcontent' style='display:none;' class='clearfix'><header id='vrflheader'></header><section id='vrflcontent'></section><footer></footer></div>
@@ -74,7 +75,6 @@ class ECP_Template_Listel extends ECP_Template {
     </div>
 </footer>           
  ";
-        parent::createBody($body);
     }
 
 }

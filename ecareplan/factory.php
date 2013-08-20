@@ -103,6 +103,7 @@ abstract class ECPFactory {
      */
     public static function getTemplate($templatefile) {
         if (!self::$template) {
+            ecpimport("template.templateinterface"); //interface first!
             ecpimport("template.template");
             self::$template = ECP_Template::getInstance($templatefile);
         }
