@@ -26,13 +26,13 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
         ecpimport("components.overleg.base.view"); //basis view (observable)
         //onderstaand moet op termijn verdwijnen!
         ecpimport("components.overleg.overlegmodel"); //overleg model
-        ecpimport("components.overleg.overlegview"); //std view
+      //  ecpimport("components.overleg.overlegview"); //std view
         //bovenstaand moet op termijn verdwijnen!
         $this->action = "std_command";
         $this->app = ECPFactory::getApp(); //haal de app op om template te gaan veranderen
         $this->user = $this->app->getUser(); //via de app de user ophalen zodat we zeker de huidige user hebben :)
         $this->model = new ECP_Comp_OverlegModel($this->user->getUserId());
-        $this->view = new ECP_Comp_OverlegView($this->app);
+       // $this->view = new ECP_Comp_OverlegView($this->app);
     }
 
     public function command($command) {
@@ -60,8 +60,18 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
 
     public function std_command() {
         //we tonen de overleg aanvragen zodat we die kunnen starten :)
-        $aanvragen = $this->model->getOverlegAanvragen();
-        $this->view->viewList($aanvragen);
+        //aanvragen opsporen
+        ecpimport("components.overleg.aanvraag.aanvraagmodel");
+        $aanmod = new ECP_Comp_Overleg_AanvraagModel(0);
+        $aanvragen = $aanmod->getAanvraagByUser(0);
+        //overleggen opsporen
+        ecpimport("components.overleg.overleg.overlegmodel");
+        $vrmod = new ECP_Comp_Overleg_OverlegModel(0);
+        $overleggen = $vrmod->getOverlegByUser(0);
+        //view laden
+        ecpimport("components.overleg.overleg.overlegview");
+        $vrview = new ECP_Comp_Overleg_OverlegView($this->app);
+        $vrview->viewList($aanvragen,$overleggen);
     }
 
     /**

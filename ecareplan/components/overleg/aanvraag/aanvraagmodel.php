@@ -25,6 +25,24 @@ class ECP_Comp_Overleg_AanvraagModel extends ECP_Comp_Overleg_Model{
     }
     
     /**
+     * Haal de overleg aanvraag(en) op via de gebruiker en geef het object of het resultaat
+     * @param UserId $uid
+     * @param boolean $obj Het Object ja of nee? (nee = resultaat in array)
+     * @return null|\AanvraagOverleg steeds null wanneer leeg resultaat anders het object of het resultaatarray
+     */
+    public function getAanvraagByUser($uid,$obj=false){
+        //Hier regeltjes over welke aanvragen die user nu eigenlijk mag zien...
+        $this->aanvraag->setStatus("aanvraag");
+        $results = $this->aanvraag->findByExample(self::$db,$this->aanvraag);
+        if(empty($results)){
+            return null;
+        }else{
+            if($obj) return $results[0];
+            else return self::resultToArray($results, AanvraagOverleg::getFieldNames());
+        }
+    }
+    
+    /**
      * Haal de overleg aanvraag op via de id en geef het object of het resultaat
      * @param AanvraagID $id
      * @param boolean $obj Het Object ja of nee? (nee = resultaat in array)

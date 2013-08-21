@@ -19,7 +19,7 @@ class ECP_Comp_Overleg_View implements ECP_OverlegObservable{
 
     public function __CONSTRUCT($app) {
         self::$app = $app;
-        $this->app->setTemplate("listel");
+        self::$app->setTemplate("listel");
         $this->state = "view.constructed";
     }
     
@@ -74,5 +74,20 @@ class ECP_Comp_Overleg_View implements ECP_OverlegObservable{
         return $this;
     }
     //End special observer methods
+    
+    //stack methods
+        protected function export() {
+        self::$app->setTemplateData(array("content" => $this->content, "content-title" => "Overleg", "content-sub-title" => $this->title, "title" => "Ecareplan ~ " . $this->title, "headscript" => $this->script));
+    }
+    
+    protected function moveToContent(){
+        $this->content.=$this->stack; $this->stack = '';
+        return $this;
+    }
+    
+    protected function moveToScript(){
+        $this->script.=$this->stack; $this->stack ='';
+        return $this;
+    }
 }
 ?>
