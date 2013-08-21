@@ -18,37 +18,36 @@ class OverlegGewoon extends Overlegbasis{
 }
 
 class OverlegMenos extends Overlegbasis{
-    use OverlegOmbTrait{        
+    use OverlegOmbTrait;
+    /*
     OverlegOmbTrait::assignByHash as assignByHashOmb;
     OverlegOmbTrait::findById as findByIdOmb;
     OverlegOmbTrait::getFieldNames as getFieldNamesOmb;
     OverlegOmbTrait::toArray as toArrayOmb;
-    }
-    
+    */  
 }
 
-/*
 class OverlegLok extends Overlegbasis{
     use OverlegLokTrait, OverlegOrgTrait;
 }
 
+/*
 class OverlegGDT extends Overlegbasis{
-    use OverlegExtendedTrait, OverlegOrgTrait{
-        OverlegExtendedTrait:: setId insteadof OverlegOrgTrait;
-        OverlegOrgTrait:: setId insteadof OverlegExtendedTrait;
-    }
+    use OverlegExtendedTrait, OverlegOrgTrait;
 }
+*/
 
 class OverlegPsy extends Overlegbasis {
     use OverlegOrg, OverlegPsy;    
 }
 
+/*
 Class OverlegPsy2013 extends Overlegbasis{
     use OverlegExtendedTrait, OverlegOrgTrait, OverlegPsyTrait;
 }
+ * */
 
 class OverlegTp extends Overlegbasis{
     use OverlegTpTrait;
 }
- * */
 ?>

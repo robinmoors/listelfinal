@@ -191,7 +191,6 @@ trait OverlegOmbTrait {
         }
         
         public function updateToDatabaseOmb(PDO $db, $parent){
-            echo '------------ UPDATE OMB -----------------';
             if($parent) {
                 parent::updateToDatabase($db);
             }

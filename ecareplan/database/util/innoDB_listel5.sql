@@ -1313,7 +1313,7 @@ COLLATE = utf8_general_ci;
 --
 
 CREATE  TABLE IF NOT EXISTS `overlegextended` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT ,
+  `uid` INT(11) NOT NULL AUTO_INCREMENT ,
   `overleg_id` INT(11) NOT NULL,
   `locatieTekst` VARCHAR(200) NULL DEFAULT NULL ,
   `tijdstip` VARCHAR(80) NULL DEFAULT NULL ,
@@ -1326,7 +1326,7 @@ CREATE  TABLE IF NOT EXISTS `overlegextended` (
   `verklaring_huisarts` ENUM('thuis','opgenomen') NULL DEFAULT NULL ,
   `ambulant` ENUM('ambulant','ziekenhuis') NULL DEFAULT NULL ,
   `huisarts_belangrijk` TINYINT(1) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`uid`),
   INDEX overleg_idx (`overleg_id`),
   CONSTRAINT `FK_overlegextended_overleg_id`
     FOREIGN KEY (`overleg_id` )
@@ -1346,13 +1346,13 @@ COLLATE = utf8_general_ci;
 --
 
 CREATE  TABLE IF NOT EXISTS `overlegtp` (
- `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `uid` INT(11) NOT NULL AUTO_INCREMENT ,
  `overleg_id` INT(11) NOT NULL,
  `tp_verslag` TEXT NULL DEFAULT NULL ,
  `tp_auteur` ENUM('OC','TP') NULL DEFAULT NULL ,
  `tp_nieuwepartners` TEXT NULL DEFAULT NULL ,
  `tp_rechtenOC` TINYINT(4) NULL DEFAULT '1' ,
- PRIMARY KEY (`id`),
+ PRIMARY KEY (`uid`),
  INDEX overleg_idx (`overleg_id`),
  CONSTRAINT `FK_overlegtp_overleg_id`
     FOREIGN KEY (`overleg_id` )
@@ -1393,12 +1393,12 @@ COLLATE = utf8_general_ci;
 --
 
  CREATE TABLE IF NOT EXISTS `overlegorg` (
- `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `uid` INT(11) NOT NULL AUTO_INCREMENT ,
  `overleg_id` INT(11) NOT NULL,
  `organisatie_factuur` INT(11) NULL DEFAULT NULL ,
  `organisatie_factuur_datum` VARCHAR(12) NULL DEFAULT NULL ,
  `organisatie_dubbel` INT(11) NULL DEFAULT NULL ,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`uid`),
   INDEX overleg_idx (`overleg_id`),
   CONSTRAINT `FK_overlegorg_overleg_id`
     FOREIGN KEY (`overleg_id` )
@@ -1416,11 +1416,11 @@ COLLATE = utf8_general_ci;
 --
   
  CREATE TABLE IF NOT EXISTS `overlegpsy` (
- `id` INT(11) NOT NULL AUTO_INCREMENT , 
+ `uid` INT(11) NOT NULL AUTO_INCREMENT , 
  `overleg_id` INT(11) NOT NULL,
  `psy_algemeen` TEXT NULL DEFAULT NULL ,
  `psy_doelstellingen` TEXT NULL DEFAULT NULL ,
- PRIMARY KEY (`id`),
+ PRIMARY KEY (`uid`),
  INDEX overleg_idx (`overleg_id`),
  CONSTRAINT `FK_overlegpsy_overleg_id`
     FOREIGN KEY (`overleg_id` )
@@ -1438,11 +1438,11 @@ COLLATE = utf8_general_ci;
 --
   
  CREATE TABLE IF NOT EXISTS `overleglok` (
- `id` INT(11) NOT NULL AUTO_INCREMENT , 
+ `uid` INT(11) NOT NULL AUTO_INCREMENT , 
  `overleg_id` INT(11) NOT NULL,
  `lokaal_algemeen` TEXT NULL DEFAULT NULL ,
  `lokaal_doelstellingen` TEXT NULL DEFAULT NULL ,
- PRIMARY KEY (`id`),
+ PRIMARY KEY (`uid`),
  INDEX overleg_idx (`overleg_id`),
  CONSTRAINT `FK_overleglok_overleg_id`
     FOREIGN KEY (`overleg_id` )

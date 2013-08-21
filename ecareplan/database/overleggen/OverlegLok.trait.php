@@ -1,32 +1,32 @@
 <?php
 trait OverlegLokTrait {
-	private $id;
+	private $uid;
 	private $overlegId;
 	private $lokaalAlgemeen;
 	private $lokaalDoelstellingen;
 
 	/**
-	 * set value for id 
+	 * set value for uid 
 	 *
 	 * type:INT,size:10,default:null,primary,unique,autoincrement
 	 *
-	 * @param mixed $id
+	 * @param mixed $uid
 	 * @return Overleglok
 	 */
-	public function &setId($id) {
-		$this->id=$id;
+	public function &setUid($uid) {
+		$this->uid=$uid;
 		return $this;
 	}
 
 	/**
-	 * get value for id 
+	 * get value for uid 
 	 *
 	 * type:INT,size:10,default:null,primary,unique,autoincrement
 	 *
 	 * @return mixed
 	 */
-	public function getId() {
-		return $this->id;
+	public function getUid() {
+		return $this->uid;
 	}
 
 	/**
@@ -108,27 +108,27 @@ trait OverlegLokTrait {
 	 */
 	public function toArray() {
 		return array(
-			'id'=>$this->getId(),
+			'uid'=>$this->getUid(),
 			'overleg_id'=>$this->getOverlegId(),
 			'lokaal_algemeen'=>$this->getLokaalAlgemeen(),
 			'lokaal_doelstellingen'=>$this->getLokaalDoelstellingen());
 	}
         
         public function assignByHash($result) {
-		$this->setId($result['id']);
+		$this->setUid($result['uid']);
 		$this->setOverlegId($result['overleg_id']);
 		$this->setLokaalAlgemeen($result['lokaal_algemeen']);
 		$this->setLokaalDoelstellingen($result['lokaal_doelstellingen']);
 	}
         
         public function getFieldNames(){
-            return array(1=>'id',
+            return array(1=>'uid',
                 2=>'overleg_id',
                 3=>'lokaal_algemeen',
                 4=>'lokaal_doelstellingen');
         }
         
-        public function insertIntoDatabase(PDO $db){
+        public function insertIntoDatabaseLok(PDO $db){
             $overlegid = $this->getOverlegId();
             $lokaalalgemeen = $this->getLokaalAlgemeen();
             $lokaaldoelstellingen = $this->getLokaalDoelstellingen();
@@ -149,18 +149,18 @@ trait OverlegLokTrait {
             return $affected;
         }
         
-        public function updateToDatabase(PDO $db){
-            $id = $this->getId();
+        public function updateToDatabaseLok(PDO $db){
+            $uid = $this->getUid();
             $overlegid = $this->getOverlegId();
             $lokaalalgemeen = $this->getLokaalAlgemeen();
             $lokaaldoelstellingen = $this->getLokaalDoelstellingen();
             
             $query = 'UPDATE listel5.overleglok
                 SET overleg_id = :overleg_id, lokaal_algemeen = :lokaal_algemeen, lokaal_doelstellingen= :lokaal_doelstellingen
-                WHERE id = :id';
+                WHERE uid = :uid';
             try{
                 $statement= $db->prepare($query);
-                $statement->bindValue(':id',$id);
+                $statement->bindValue(':uid',$uid);
                 $statement->bindValue(':overleg_id',$overlegid);
                 $statement->bindValue(':lokaal_algemeen',$lokaalalgemeen);
                 $statement->bindValue(':lokaal_doelstellingen',$lokaaldoelstellingen);
@@ -173,13 +173,13 @@ trait OverlegLokTrait {
             return $affected;
         }
         
-        public function deleteFromDatabase(PDO $db){
-            $id = $this->getId();
+        public function deleteFromDatabaseLok(PDO $db){
+            $uid = $this->getUid();
             $query = 'DELETE FROM listel5.overleglok
-                WHERE id= :id';
+                WHERE uid= :uid';
             try{
                 $statement=$db->prepare($query);
-                $statement->bindValue(':id',$id);
+                $statement->bindValue(':uid',$uid);
                 $statement->execute();
                 $valid = ($statement->rowCount() >=1);
                 $statement->closeCursor();
@@ -190,11 +190,11 @@ trait OverlegLokTrait {
             return $valid;
         }
         
-        public function findById(PDO $db){
-            $id = $this->getId();
-            $query = 'SELECT `id`, `overleg_id`, `lokaal_algemeen`, `lokaal_doelstellingen` FROM `listel5`.`overleglok` WHERE `id`= :id';
+        public function findByIdLok(PDO $db){
+            $uid = $this->getUid();
+            $query = 'SELECT `uid`, `overleg_id`, `lokaal_algemeen`, `lokaal_doelstellingen` FROM `listel5`.`overleglok` WHERE `id`= :id';
             $statement = $db->prepare($query);
-            $statement->bindValue(':id', $id);
+            $statement->bindValue(':uid', $uid);
             $affected= $statement->execute();
             if (false===$affected) {
                     $statement->closeCursor();			
@@ -207,9 +207,9 @@ trait OverlegLokTrait {
             return toArray($result);
         }
         
-        public function findByOverleg(PDO $db){
+        public function findByOverlegLok(PDO $db){
             $overlegid = $this->getOverlegId();
-            $query  = 'SELECT `id`, `overleg_id`, `lokaal_algemeen`, `lokaal_doelstellingen` FROM `listel5`.`overleglok` WHERE `overleg_id`= :overleg_id';
+            $query  = 'SELECT `uid`, `overleg_id`, `lokaal_algemeen`, `lokaal_doelstellingen` FROM `listel5`.`overleglok` WHERE `overleg_id`= :overleg_id';
             $statement = $db->prepare($query);
             $statement->bindValue(':overleg_id', $overlegid);
             $statement->execute();

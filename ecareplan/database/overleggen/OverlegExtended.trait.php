@@ -1,6 +1,6 @@
 <?php
 trait OverlegExtendedTrait {
-	private $id;
+	private $uid;
 	private $overlegId;
 	private $locatieTekst;
 	private $tijdstip;
@@ -15,27 +15,27 @@ trait OverlegExtendedTrait {
 	private $huisartsBelangrijk;
 
 	/**
-	 * set value for id 
+	 * set value for uid 
 	 *
 	 * type:INT,size:10,default:null,primary,unique,autoincrement
 	 *
-	 * @param mixed $id
+	 * @param mixed $uid
 	 * @return Overlegextended
 	 */
-	public function &setId($id) {
-		$this->id=$id;
+	public function &setUid($uid) {
+		$this->uid=$uid;
 		return $this;
 	}
 
 	/**
-	 * get value for id 
+	 * get value for uid 
 	 *
 	 * type:INT,size:10,default:null,primary,unique,autoincrement
 	 *
 	 * @return mixed
 	 */
-	public function getId() {
-		return $this->id;
+	public function getUid() {
+		return $this->uid;
 	}
 
 	/**
@@ -333,7 +333,7 @@ trait OverlegExtendedTrait {
 	 */
 	public function toArray() {
 		return array(
-			'id'=>$this->getId(),
+			'uid'=>$this->getUid(),
 			'overleg_id'=>$this->getOverlegId(),
 			'locatieTekst'=>$this->getLocatieTekst(),
 			'tijdstip'=>$this->getTijdstip(),
