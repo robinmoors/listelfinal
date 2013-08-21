@@ -28,7 +28,16 @@ class OverlegMenos extends Overlegbasis{
 }
 
 class OverlegLok extends Overlegbasis{
-    use OverlegLokTrait, OverlegOrgTrait;
+    use OverlegLokTrait, OverlegOrgTrait{
+        OverlegLokTrait::setId insteadof OverlegOrgTrait;
+        OverlegLokTrait::getId insteadof OverlegOrgTrait;
+        OverlegLokTrait::getOverlegId insteadof OverlegOrgTrait;
+        OverlegLokTrait::setOverlegId insteadof OverlegOrgTrait;
+        OverlegOrgTrait::setId as setIdOrg;
+        OverlegOrgTrait::getId as getIdOrg;
+        OverlegOrgTrait::getOverlegId as setOverlegIdOrg;
+        OverlegOrgTrait::setOverlegId as getOverlegIdOrg;
+    }
 }
 
 /*
@@ -38,7 +47,17 @@ class OverlegGDT extends Overlegbasis{
 */
 
 class OverlegPsy extends Overlegbasis {
-    use OverlegOrg, OverlegPsy;    
+    use OverlegOrg, OverlegPsy{
+        OverlegOrgTrait::setId insteadof OverlegPsyTrait;
+        OverlegOrgTrait::getId insteadof OverlegPsyTrait;
+        OverlegOrgTrait::getOverlegId insteadof OverlegPsyTrait;
+        OverlegOrgTrait::setOverlegId insteadof OverlegPsyTrait;
+        
+        OverlegPsyTrait::setId as setIdPsy;
+        OverlegPsyTrait::getId as getIdPsy;
+        OverlegPsyTrait::getOverlegId as setOverlegIdPsy;
+        OverlegPsyTrait::setOverlegId as getOverlegIdPsy;
+    }
 }
 
 /*
