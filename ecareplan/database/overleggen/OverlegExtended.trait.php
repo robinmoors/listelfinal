@@ -382,32 +382,42 @@ trait OverlegExtendedTrait {
                 13=>'huisarts_belangrijk');
         }
         
-        /*
+        
         public function insertIntoDatabaseExt(PDO $db){
             $uid = $this->getUid();
             $overlegid  = $this->getOverlegId();
-            $ombfactuur = $this->getLocatieTekst();
-            $ombactief = $this->getTijdstip();
-            $ombrangorde = $this->getAkkoortPatient();
-            $overlegid  = $this->getAanwezigPatient();
-            $ombfactuur = $this->getVertegenwoordiger();
-            $ombactief = $this->getEvalNieuw();
-            $ombrangorde = $this->getAfronddatum();
-            $overlegid  = $this->getVolgendeDatum();
-            $ombfactuur = $this->getVerklaringHuisarts();
-            $ombactief = $this->getAmbulant();
-            $ombrangorde = $this->getHuisartsBelangrijk();
+            $locatie = $this->getLocatieTekst();
+            $tijdstip = $this->getTijdstip();
+            $akkoord = $this->getAkkoortPatient();
+            $aanwezig  = $this->getAanwezigPatient();
+            $vertegenwoordiger = $this->getVertegenwoordiger();
+            $eval = $this->getEvalNieuw();
+            $afrond = $this->getAfronddatum();
+            $volgende  = $this->getVolgendeDatum();
+            $verklaring = $this->getVerklaringHuisarts();
+            $ambulant = $this->getAmbulant();
+            $huisarts = $this->getHuisartsBelangrijk();
             
             $query = 'INSERT INTO `overlegomb`
-                SET `uid` = :uid, `overleg_id`= :overleg_id, `omb_factuur`= :omb_factuur, `omb_actief`= :omb_actief, `omb_rangorde`= :omb_rangorde';
+                SET `uid` = :uid, `overleg_id`= :overleg_id, `locatieTekst`= :locatieTekst, `tijdstip`= :tijdstip, `akkoord_patient`= :akkoord_patient ,
+                `aanwezig_patient` = :aanwezig_patient, `vertegenwoordiger`= :vertegenwoordiger, `eval_nieuw`= :eval_nieuw, `afronddatum`= :afronddatum, `volgende_datum`= :volgende_datum,
+                `verklaring_huisarts` = :verklaring_huisarts, `ambulant` = :ambulant, `huisarts_belangrijk` = :huisarts_belangrijk';
             
             try{
                 $statement= $db->prepare($query);
                 $statement->bindValue(':uid',$uid);
                 $statement->bindValue(':overleg_id',$overlegid);
-                $statement->bindValue(':omb_factuur',$ombfactuur);
-                $statement->bindValue(':omb_actief',$ombactief);
-                $statement->bindValue(':omb_rangorde',$ombrangorde);
+                $statement->bindValue(':locatieTekst',$locatie);
+                $statement->bindValue(':tijdstip',$tijdstip);
+                $statement->bindValue(':akkoord_patient',$akkoord);
+                $statement->bindValue(':aanwezig_patient',$aanwezig);
+                $statement->bindValue(':vertegenwoordiger',$vertegenwoordiger);
+                $statement->bindValue(':eval_nieuw',$eval);
+                $statement->bindValue(':afronddatum',$afrond);
+                $statement->bindValue(':volgende_datum',$volgende);
+                $statement->bindValue(':verklaring_huisarts',$verklaring);
+                $statement->bindValue(':ambulant',$ambulant);
+                $statement->bindValue(':huisarts_belangrijk',$huisarts);
                 $affected = $statement->execute();
                 if (false===$affected) {
 			$statement->closeCursor();
@@ -420,11 +430,125 @@ trait OverlegExtendedTrait {
                 $statement->closeCursor();
             } catch (PDOException $e) {
                 $error_messsage = $e->getMessage();
-                //display
             }
             return $affected;
         }
-         * */
+        
+        public function updateToDatabaseExt(PDO $db, $parent){
+            if($parent) {
+                parent::updateToDatabase($db);
+            }
+            $uid = $this->getUid();
+            $overlegid  = $this->getOverlegId();
+            $locatie = $this->getLocatieTekst();
+            $tijdstip = $this->getTijdstip();
+            $akkoord = $this->getAkkoortPatient();
+            $aanwezig  = $this->getAanwezigPatient();
+            $vertegenwoordiger = $this->getVertegenwoordiger();
+            $eval = $this->getEvalNieuw();
+            $afrond = $this->getAfronddatum();
+            $volgende  = $this->getVolgendeDatum();
+            $verklaring = $this->getVerklaringHuisarts();
+            $ambulant = $this->getAmbulant();
+            $huisarts = $this->getHuisartsBelangrijk();
+            
+            $query = 'UPDATE `overlegext` 
+                SET `overleg_id`= :overleg_id, `locatieTekst`= :locatieTekst, `tijdstip`= :tijdstip, `akkoord_patient`= :akkoord_patient ,
+                `aanwezig_patient` = :aanwezig_patient, `vertegenwoordiger`= :vertegenwoordiger, `eval_nieuw`= :eval_nieuw, `afronddatum`= :afronddatum, `volgende_datum`= :volgende_datum,
+                `verklaring_huisarts` = :verklaring_huisarts, `ambulant` = :ambulant, `huisarts_belangrijk` = :huisarts_belangrijk
+                WHERE `uid` = :uid';
+            
+            try{
+                $statement= $db->prepare($query);
+                $statement->bindValue(':uid',$uid);
+                $statement->bindValue(':overleg_id',$overlegid);
+                $statement->bindValue(':locatieTekst',$locatie);
+                $statement->bindValue(':tijdstip',$tijdstip);
+                $statement->bindValue(':akkoord_patient',$akkoord);
+                $statement->bindValue(':aanwezig_patient',$aanwezig);
+                $statement->bindValue(':vertegenwoordiger',$vertegenwoordiger);
+                $statement->bindValue(':eval_nieuw',$eval);
+                $statement->bindValue(':afronddatum',$afrond);
+                $statement->bindValue(':volgende_datum',$volgende);
+                $statement->bindValue(':verklaring_huisarts',$verklaring);
+                $statement->bindValue(':ambulant',$ambulant);
+                $statement->bindValue(':huisarts_belangrijk',$huisarts);
+                $affected = $statement->execute();
+                if (false===$affected) {
+			$statement->closeCursor();
+			throw new Exception($statement->errorCode() . ':' . var_export($statement->errorInfo(), true), 0);
+		}
+		$lastInsertId=$db->lastInsertId();
+		if (false!==$lastInsertId) {
+			$this->setUid($lastInsertId);
+		}
+                $statement->closeCursor();
+            } catch (PDOException $e) {
+                $error_messsage = $e->getMessage();
+            }
+        }
+        
+        public function deleteFromDatabaseExt(PDO $db, $parent){
+            $uid = $this->getUid();
+            $query = 'DELETE FROM `overlegext` 
+            WHERE `uid`= :uid';
+            try{
+                $statement=$db->prepare($query);
+                $statement->bindValue(':uid',$uid);
+                $statement->execute();
+                if (false===$affected) {
+			$stmt->closeCursor();
+			throw new Exception($stmt->errorCode() . ':' . var_export($stmt->errorInfo(), true), 0);
+		}
+                $statement->closeCursor();
+                if($parent) {
+                    parent::deleteFromDatabase($db);
+                }
+            } catch (PDOException $e){
+                $error_message = $e->getMessage();
+            }
+            return $valid;
+        }
          
+        public static function findByIdExt(PDO $db, $id){
+            $query = 'SELECT `uid`, `overleg_id`, `locatieTekst`, `tijdstip`, `akkoord_patient`, `aanwezig_patient`, `vertegenwoordiger`, `eval_nieuw`, `afronddatum`, `volgende_datum`, `verklaring_huisarts`, `ambulant`, `huisarts_belangrijk`
+                FROM `overlegext` 
+                WHERE `uid`= :uid';          
+            
+            $statement = $db->prepare($query);
+            $statement->bindValue(':uid', $id);
+            $affected= $statement->execute();
+            if (false===$affected) {
+                    $statement->closeCursor();			
+            }
+            $result = $statement->fetch();
+            $statement->closeCursor();
+            if(!$result) {
+                    return null;
+            }
+            return $result;
+        }
+        
+        public static function findByOverleg(PDO $db,$id){
+            $query = 'SELECT `uid`, `overleg_id`, `locatieTekst`, `tijdstip`, `akkoord_patient`, `aanwezig_patient`, `vertegenwoordiger`, `eval_nieuw`, `afronddatum`, `volgende_datum`, `verklaring_huisarts`, `ambulant`, `huisarts_belangrijk`
+                FROM `overlegext` 
+                WHERE `overleg_id` = :overleg_id';
+            
+            $statement = $db->prepare($query);
+            $statement->bindValue(':overleg_id', $id);
+            $statement->execute();
+            
+            if (false===$affected) {
+                    $statement->closeCursor();	
+                    throw new Exception($statement->errorCode() . ':' . var_export($statement->errorInfo(), true), 0);
+            }
+            $result = $statement->fetch();
+            $statement->closeCursor();
+            if(!$result) {
+                //echo '{"succes":"negative","message":"Oei het loopt even mis!<br/>We vonden geen overleg met het id"}';
+                    return null;
+            }
+            return $result;
+        }
 }
 ?>
