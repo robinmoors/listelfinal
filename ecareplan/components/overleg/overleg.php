@@ -97,7 +97,9 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                 }
                 else{
                     $formmodel->getForm("aanvraag");
-                    $this->view->viewOverlegAanvraag($aanvraag);
+                    ecpimport("components.overleg.overlegview");
+                    $view = new ECP_Comp_OverlegView($this->app);
+                    $view->viewOverlegAanvraag($aanvraag);
                     //$this->view->editOverleg($aanvraag, $formmodel->getForm("edit")); //maar 1 overleg dus dat ook bewerken...
                 }
             }
@@ -132,7 +134,9 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                 $formmodel->updateZAList($this->model->getZA());
                 //zorgaanbieders profiel PSY ophalen
                 $formmodel->updatePSYList($this->model->getPSY());
-                $this->view->newOverleg($patient, $pat_id, $formmodel->getForm("new"));
+                ecpimport("components.overleg.overlegview");
+                $view = new ECP_Comp_OverlegView($this->app);
+                $view->newOverleg($patient, $pat_id, $formmodel->getForm("new"));
             } else {
                 $patienten = $this->model->getAllPatients();
                 $formmodel->updatePatientList($patienten);
