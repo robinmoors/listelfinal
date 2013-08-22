@@ -131,7 +131,7 @@ trait OverlegOrgTrait {
 	 *
 	 * @return array
 	 */
-	public function toArray() {
+	public function toArrayOrg() {
 		return array(
 			'uid'=>$this->getUid(),
 			'overleg_id'=>$this->getOverlegId(),
@@ -140,7 +140,7 @@ trait OverlegOrgTrait {
 			'organisatie_dubbel'=>$this->getOrganisatieDubbel());
 	}
         
-        public function assignByHash($result){
+        public function assignByHashOrg($result){
             parent::assignByHash($result);
             $this->setUid($result['uid']);
             $this->setOverlegId($result['overleg_id']);
@@ -149,7 +149,7 @@ trait OverlegOrgTrait {
             $this->setOrganisatieDubbel($result['organisatie_dubbel']);
         }
         
-        public static function getFieldNames(){
+        public static function getFieldNamesOrg(){
             return array(1=>'uid',
                 2=>'overleg_id',
                 3=>'organisatie_factuur',

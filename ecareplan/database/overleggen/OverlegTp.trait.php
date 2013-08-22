@@ -156,7 +156,7 @@ trait OverlegTpTrait {
 	 *
 	 * @return array
 	 */
-	public function toArray() {
+	public function toArrayTp() {
 		return array(
 			'uid'=>$this->getUid(),
 			'overleg_id'=>$this->getOverlegId(),
@@ -166,7 +166,7 @@ trait OverlegTpTrait {
 			'tp_rechtenOC'=>$this->getTpRechtenoc());
 	}
         
-        public function assignByHash($result){
+        public function assignByHashTp($result){
             parent::assignByHash($result);
             $this->setUid($result['uid']);
             $this->setOverlegId($result['overleg_id']);
@@ -176,7 +176,7 @@ trait OverlegTpTrait {
             $this->setTpRechtenoc($result['tp_rechtenOC']);
         }
         
-        public static function getFieldNames(){
+        public static function getFieldNamesTp(){
             return array(1=>'uid',
                 2=>'overleg_id',
                 3=>'tp_verslag',

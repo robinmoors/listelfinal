@@ -75,7 +75,7 @@ class ECP_Comp_OmbModel {
         $array = $result->toHash();
 
         $omb = new OverlegMenos();
-        $omb->assignByHash($array);
+        $omb->assignByHashOmb($array);
         return $omb;
     }
     

@@ -29,12 +29,12 @@ class OverlegMenos extends Overlegbasis{
 
 class OverlegLok extends Overlegbasis{
     use OverlegLokTrait, OverlegOrgTrait{
-        OverlegLokTrait::setId insteadof OverlegOrgTrait;
-        OverlegLokTrait::getId insteadof OverlegOrgTrait;
+        OverlegLokTrait::setUid insteadof OverlegOrgTrait;
+        OverlegLokTrait::getUid insteadof OverlegOrgTrait;
         OverlegLokTrait::getOverlegId insteadof OverlegOrgTrait;
         OverlegLokTrait::setOverlegId insteadof OverlegOrgTrait;
-        OverlegOrgTrait::setId as setIdOrg;
-        OverlegOrgTrait::getId as getIdOrg;
+        OverlegOrgTrait::setUid as setIdOrg;
+        OverlegOrgTrait::getUid as getIdOrg;
         OverlegOrgTrait::getOverlegId as setOverlegIdOrg;
         OverlegOrgTrait::setOverlegId as getOverlegIdOrg;
     }
@@ -47,14 +47,14 @@ class OverlegGDT extends Overlegbasis{
 */
 
 class OverlegPsy extends Overlegbasis {
-    use OverlegOrg, OverlegPsy{
-        OverlegOrgTrait::setId insteadof OverlegPsyTrait;
-        OverlegOrgTrait::getId insteadof OverlegPsyTrait;
+    use OverlegOrgTrait, OverlegPsyTrait{
+        OverlegOrgTrait::setUid insteadof OverlegPsyTrait;
+        OverlegOrgTrait::getUid insteadof OverlegPsyTrait;
         OverlegOrgTrait::getOverlegId insteadof OverlegPsyTrait;
         OverlegOrgTrait::setOverlegId insteadof OverlegPsyTrait;
         
-        OverlegPsyTrait::setId as setIdPsy;
-        OverlegPsyTrait::getId as getIdPsy;
+        OverlegPsyTrait::setUid as setIdPsy;
+        OverlegPsyTrait::getUid as getIdPsy;
         OverlegPsyTrait::getOverlegId as setOverlegIdPsy;
         OverlegPsyTrait::setOverlegId as getOverlegIdPsy;
     }

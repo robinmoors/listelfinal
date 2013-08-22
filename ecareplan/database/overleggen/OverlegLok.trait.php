@@ -106,7 +106,7 @@ trait OverlegLokTrait {
 	 *
 	 * @return array
 	 */
-	public function toArray() {
+	public function toArrayLok() {
 		return array(
 			'uid'=>$this->getUid(),
 			'overleg_id'=>$this->getOverlegId(),
@@ -114,14 +114,14 @@ trait OverlegLokTrait {
 			'lokaal_doelstellingen'=>$this->getLokaalDoelstellingen());
 	}
         
-        public function assignByHash($result) {
+        public function assignByHashLok($result) {
 		$this->setUid($result['uid']);
 		$this->setOverlegId($result['overleg_id']);
 		$this->setLokaalAlgemeen($result['lokaal_algemeen']);
 		$this->setLokaalDoelstellingen($result['lokaal_doelstellingen']);
 	}
         
-        public function getFieldNames(){
+        public static function getFieldNamesLok(){
             return array(1=>'uid',
                 2=>'overleg_id',
                 3=>'lokaal_algemeen',
@@ -190,7 +190,7 @@ trait OverlegLokTrait {
             return $valid;
         }
         
-        public function findByIdLok(PDO $db){
+        public static function findByIdLok(PDO $db){
             $uid = $this->getUid();
             $query = 'SELECT `uid`, `overleg_id`, `lokaal_algemeen`, `lokaal_doelstellingen` FROM `listel5`.`overleglok` WHERE `id`= :id';
             $statement = $db->prepare($query);
@@ -207,7 +207,7 @@ trait OverlegLokTrait {
             return toArray($result);
         }
         
-        public function findByOverlegLok(PDO $db){
+        public static function findByOverlegLok(PDO $db){
             $overlegid = $this->getOverlegId();
             $query  = 'SELECT `uid`, `overleg_id`, `lokaal_algemeen`, `lokaal_doelstellingen` FROM `listel5`.`overleglok` WHERE `overleg_id`= :overleg_id';
             $statement = $db->prepare($query);

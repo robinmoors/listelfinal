@@ -106,7 +106,7 @@ trait OverlegPsyTrait {
 	 *
 	 * @return array
 	 */
-	public function toArray() {
+	public function toArrayPsy() {
 		return array(
 			'uid'=>$this->getUid(),
 			'overleg_id'=>$this->getOverlegId(),
@@ -114,7 +114,7 @@ trait OverlegPsyTrait {
 			'psy_doelstellingen'=>$this->getPsyDoelstellingen());
 	}
         
-        public function assignByHash($result){
+        public function assignByHashPsy($result){
             parent::assignByHash($result);
             $this->setUid($result['uid']);
             $this->setOverlegId($result['overleg_id']);
@@ -122,7 +122,7 @@ trait OverlegPsyTrait {
             $this->setPsyDoelstellingen($result['psy_doelstellingen']);
         }
         
-        public static function getFieldNames(){
+        public static function getFieldNamesPsy(){
             return array(1=>'uid',
                 2=>'overleg_id',
                 3=>'psy_algemeen',

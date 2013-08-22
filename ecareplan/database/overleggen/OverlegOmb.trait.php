@@ -130,7 +130,7 @@ trait OverlegOmbTrait {
 	 *
 	 * @return array
 	 */
-	public function toArray() {
+	public function toArrayOmb() {
 		return array(
 			'uid'=>$this->getUid(),
 			'overleg_id'=>$this->getOverlegId(),
@@ -139,7 +139,7 @@ trait OverlegOmbTrait {
 			'omb_rangorde'=>$this->getOmbRangorde());
 	}
         
-        public function assignByHash($result){
+        public function assignByHashOmb($result){
             parent::assignByHash($result);
             $this->setUid($result['uid']);
             $this->setOverlegId($result['overleg_id']);
@@ -148,7 +148,7 @@ trait OverlegOmbTrait {
             $this->setOmbRangorde($result['omb_rangorde']);
         }
         
-        public static function getFieldNames(){
+        public static function getFieldNamesOmb(){
             return array(1=>'uid',
                 2=>'overleg_id',
                 3=>'omb_factuur',
