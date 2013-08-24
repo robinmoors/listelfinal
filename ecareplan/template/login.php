@@ -11,7 +11,7 @@ class ECP_Template_Login extends ECP_Template implements ECP_TemplateInterface {
     
     public function __CONSTRUCT() {
         parent::$styles = array("listel");
-        parent::$scripts = array("equinsi");
+        parent::$scripts = array("ecareplan");
         parent::$rawbody = "
              <div id='overflowbox' style='display:none;'>
     <div id='overflow'>&nbsp;</div>

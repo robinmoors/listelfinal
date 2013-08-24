@@ -75,12 +75,12 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
     }
 
     /**
-     * Bewerken van een aanvraag of overleg ~ TODO ONDERSCHEID OVERLEG ? AANVRAAG ? ~
-     * @url http://listel.be/ecareplan/overleg/bewerk/
+     * Plan een overleg na indienen van een aanvraag
+     * @url http://listel.be/ecareplan/overleg/plan/
      * 
      */
     
-    public function bewerk() {
+    public function plan() {
         if (!is_null($this->vars[0])) {
             ecpimport("components.overleg.base.overlegform");
             $formmodel = new ECP_Comp_OverlegForm();
@@ -89,19 +89,16 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                 $overleg = $this->model->getOverlegById($this->vars[1]);
                 $this->view->editOverleg($overleg, $formmodel->getForm("edit"));
             } else {
-                //we hebben de code nodig en niet de ID dus eerst omzetten!!
-                $aanvraag = $this->model->getOverlegAanvraag($this->vars[0]);
-                if (count($aanvraag) > 1) { //meer dan 1 overleg gevonden dus daar uit kiezen...
-                    
-                    $this->view->viewOverlegList($aanvraag);
-                }
-                else{
-                    $formmodel->getForm("aanvraag");
-                    ecpimport("components.overleg.overlegview");
-                    $view = new ECP_Comp_OverlegView($this->app);
-                    $view->viewOverlegAanvraag($aanvraag);
-                    //$this->view->editOverleg($aanvraag, $formmodel->getForm("edit")); //maar 1 overleg dus dat ook bewerken...
-                }
+                //MODEL aanvraag
+                ecpimport("components.overleg.aanvraag.aanvraagmodel");
+                $anvrmod = new ECP_Comp_Overleg_AanvraagModel(0);
+                //VIEW aanvraag
+                ecpimport("components.overleg.aanvraag.aanvraagview");
+                $anvrview = new ECP_Comp_Overleg_AanvraagView($this->app);
+                //aanvraag ophalen want we hebben de ID
+                $aanvraag = $anvrmod->getAanvraagById($this->vars[0],true); 
+                $formmodel->getForm("aanvraag");
+                $anvrview->viewPlanVanOverleg($aanvraag);
             }
         }else {
             $this->std_command();
@@ -226,25 +223,25 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                             if($oude){
                                 //waardes kijken of die bestaan en dan instellen
                                 $extra = array();
-                                $extra['ContactHvl'] = $extra->getContactHvl() ? $extra->getContactHvl() : false;
-                                $extra['ContactMz'] = $extra->getContactHvl() ? $extra->getContactHvl() : false;
+                                $extra['ContactHvl'] = $oude->getContactHvl() ? $oude->getContactHvl() : false;
+                                $extra['ContactMz'] = $oude->getContactHvl() ? $oude->getContactHvl() : false;
                                // $extra['psy_algemeen'] = $extra->getPsyAlgemeen() ? $extra->getPsyAlgemeen() : false;
                                // $extra['psy_doelstellingen'] = $extra->getPsyDoelstellingen() ? $extra->getPsyDoelstellingen : false;
                                // dient voor psy!
                             }
                             //TPRechten
-                            
+                                    //moet da? :p
                             
                             //toegewezen genre en id bepalen
-                            
+                                    //das even kijken naar de patient..
                             //problematiek instellen
-                            
+                                    //geen psy? dan ist fysisch
                             //overleg aanmaken
-                            
+                                    //jaaj :D
                             //patient updaten
-                            
+                                    //ohja.. overleg fkes koppelen aan de patient
                             //huidige betrokkenen ophalen en tp plan aanmaken
-                            
+                                    //bwa der is geen bestaand overleg en tp plan moest niet..
                         }
                         //dan gaan we de aanvraag omzetten naar een overleg!! 
                         $aanmod->setAanvraagToOverleg($aanvraag, $datum);

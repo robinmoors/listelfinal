@@ -10,7 +10,7 @@ defined("ECP_AC") or die("Stop! Wat we onder de motorkap hebben zitten houden we
 class ECP_Template_Listel extends ECP_Template{
     
     public function __CONSTRUCT() {
-        parent::$scripts = array("equinsi");
+        parent::$scripts = array("ecareplan");
         parent::$styles = array("listel");
         parent::$rawbody = "
  <div id='overflowbox' style='display:none;'>

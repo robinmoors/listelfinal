@@ -136,38 +136,7 @@ class ECP_Comp_OverlegView implements ECP_OverlegObservable{
         $this->setState("viewoverleglist.end");
         $this->export();
     }
-    public function viewOverlegAanvraag($data){
-        if ($data === null || $data === false) {
-            $this->content = "Deze pati&euml;nt blijkt geen aanvraag te hebben! <a onclick='EQ.reRoute(\"overleg\",true)'>Keer terug naar patientenlijst. (Ook om er een aan te maken)</a>";
-            $this->export();
-        } else {
-            print_r($data);
-            $content = "<div class='box'>
-                            <h5>Pati&euml;ntinfo</h5>
-                            <p>
-                            Rijksregisternummer: {$data[0]['rijksregister']} <br/>
-                            Volgnummer: SO98 - {$data[0]['code']} <br/>
-                            Pati&euml;ntnaam: {$data[0]['naam']} <br/>
-                            </p><h5>Gegevens Aanvrager</h5>
-                            <p>
-                            Aanvrager: mr x<br/>
-                            Doel: het doel
-                            </p>
-                    </div><div class='box'>
-                                <h5>Overleg Plannen:</h5><br/>";
-            $content.="Datum (dd/mm/jjjj): ".ECPFactory::getForm("aanvraagplannen")->getHtml("normal", array("datum"=>"01/01/2013","submit"=>"Plannen"))
-                    ."</div>";
-
-            $script = ECPFactory::getForm("aanvraagplannen")->getScript("/listelfinal/ecareplan/overleg/aanvraagplannen/{$data[0]['id']}", array("title" => "Plannen...",
-            "action" => "Bezig met plannen...",
-            "succes" => "Het overleg is nu geplanned! Je kan het nu bewerken. <br/><img src=\'/listelfinal/lib/images/flat-loader.gif\' />",
-            "fail" => "Er is iets misgegaan. Probeer opnieuw!"), "EQ.reRoute('overleg');");
-            $this->title = "Overleg plannen";
-            $this->content = $content;
-            $this->script = $script;
-            $this->export();
-        }
-    }
+    
     public function editOverleg($data, $form) {
         if ($data === null || $data === false) {
             $this->content = "Deze pati&euml;nt blijkt geen overleggen te hebben! <a onclick='EQ.reRoute(\"overleg\",true)'>Keer terug naar patientenlijst. (Ook om er een aan te maken)</a>";
@@ -475,11 +444,11 @@ class ECP_Comp_OverlegView implements ECP_OverlegObservable{
                     EQ.OVR = new EQ.overflow({
                         title:'Nieuw overleg'
                     });
-                    EQ.OVR.content = 'Bezig met verzenden van het nieuwe overleg<br/><img src=\'/listel_new/lib/images/flat-loader.gif\' />';
+                    EQ.OVR.content = 'Bezig met verzenden van het nieuwe overleg<br/><img src=\'/listelfinal/lib/images/flat-loader.gif\' />';
                     EQ.OVR.refresh('c').open();
                     EQ.CPU.newRequest({
                         process: pname,
-                        url: '/listel_new/ecareplan/overleg/nieuw/',
+                        url: '/listelfinal/ecareplan/overleg/nieuw/',
                         parameters: 'values='+JSON.stringify(values)+'&patid=".$pat_id."'
                     });
                     EQ.CPU.startProcess(pname);
