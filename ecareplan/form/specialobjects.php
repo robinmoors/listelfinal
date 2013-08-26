@@ -119,12 +119,10 @@ class ECP_FormObj_Postcode extends ECP_FormObj_Input {
      * @return boolean true bij goed, false bij slecht
      */
     public function validate() {
-        $reg = '/^[1-9]\d{3}$/';
-        if (!preg_match($reg, $this->value)) {
-            $this->msg = "match";
-            return false;
-        }
-        return true;
+        $int_options = array("options"=>array("min_range"=>1000, "max_range"=>9999));
+        $validation = filter_var($this->value, FILTER_VALIDATE_INT, $int_options);
+        if($validation===false) $this->msg="match"; //indien leeg is $validation null
+        return $validation;
     }
 
     public function getHtml($formname, $class) {
