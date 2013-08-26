@@ -23,8 +23,8 @@ class ECP_Comp_Omb_Controller implements ECP_ComponentController {
     protected static $db; //db is een static object (zie factory)
 
     public function __CONSTRUCT() {
-        ecpimport("components.overleg.overlegobserver"); //observer interface
-        ecpimport("components.overleg.overlegobservable"); //observable (subject) interface
+        ecpimport("components.overleg.base.overlegobserver"); //observer interface
+        ecpimport("components.overleg.base.overlegobservable"); //observable (subject) interface
         ecpimport("components.omb.ombmodel"); //std model
         ecpimport("components.omb.ombview"); //std view
         $this->action = "std_command";

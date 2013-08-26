@@ -262,19 +262,9 @@ class ECP_Comp_OverlegView implements ECP_OverlegObservable{
             
             $this->setState("newoverleg.script.start");
             $this->setState("newoverleg.script.base.start");
-            $script = "
-                //Basic validation functions
-                
-                radioValue = function(radio){
-                    var size = radio.length;
-                    for(i=0; i<size; i++){
-                        if(radio[i].checked) return radio[i].value;
-                    };
-                    return null;
-                };
-                
+            $script = ECP_Form::generateCollector($form)."
+                ".ECP_Form::generateValidationMessages()."
                 //Variables
-                
                 var niethuidighidden = true;
                 var step2hidden = true;
                 var step3hidden = true;
@@ -283,7 +273,6 @@ class ECP_Comp_OverlegView implements ECP_OverlegObservable{
                 var psyhidden = true;
                 
                 //Ajax Process
-                
                 var pname = 'nieuwoverleg';
                 EQ.CPU.makeProcess({
                     name: pname,
@@ -317,42 +306,10 @@ class ECP_Comp_OverlegView implements ECP_OverlegObservable{
             $this->setState("newoverleg.script.base.end");
             $this->moveToScript();
             unset($script);
-            $this->setState("newoverleg.script.collectvalues.start");
-            $colval = "               
-                collectValues = function(){
-                        //stap 1
-                        return {
-                            huidigok : radioValue(document.huidig_organisator.huidigok),
-                            organisator : radioValue(document.organisator_select.organisator),
-                            rdclist : document.rdc_select.rdclist.value,
-                            rdcwhy : radioValue(document.rdc_why.rdcwhy),
-                            zalist : document.za_select.zalist.value,
-                            psylist : document.psy_select.psylist.value,
-                            zawhy : radioValue(document.za_why.zawhy),
-                            psywhy : radioValue(document.psy_why.psywhy),
-                            reden : document.organisator_reden.reden.value,
-                            informeren : document.purpose.informeren.checked,
-                            overtuigen : document.purpose.overtuigen.checked,
-                            organiseren : document.purpose.organiseren.checked,
-                            debriefen : document.purpose.debriefen.checked,
-                            beslissen : document.purpose.beslissen.checked,
-                            ander : document.purpose.ander.checked,
-                            andertxt : document.ander.ander.value,
-                            naam : document.requestor.naam.value,
-                            relatie : document.requestor.relatie.value,
-                            telefoon : document.requestor.telefoon.value,
-                            email : document.requestor.email.value,
-                            organisatie : document.requestor.organisatie.value
-                        };
-                };";
-            $this->stack.=$colval;
-            $this->setState("newoverleg.script.collectvalues.end");
-            $this->moveToScript();
-            unset($colval);
             $this->setState("newoverleg.script.checknewoverleg.start");
             $check = "
                 checkNewOverleg = function(){
-                    var values = collectValues();
+                    var values = valueCollector();
                     if(values.huidigok == '0'){
                         $('#niethuidig').show();
                         niethuidighidden = false;
@@ -453,7 +410,7 @@ class ECP_Comp_OverlegView implements ECP_OverlegObservable{
                     });
                     EQ.CPU.startProcess(pname);
                };
-               $('#send').bind('click',function(){submitNewOverleg(collectValues());});
+               $('#send').bind('click',function(){submitNewOverleg(valueCollector());});
             ";
             $this->stack.=$submit;
             $this->setState("newoverleg.script.submit.end");

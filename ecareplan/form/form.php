@@ -436,7 +436,7 @@ class ECP_Form extends ECP_Object implements ECP_FactoryInterface {
      * @return javascript
      */
     public static function generateValidationMessages() {
-        return self::$eqmessages;
+        return self::$eqmessages.";";
     }
 
     /**
