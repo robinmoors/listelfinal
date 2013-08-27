@@ -60,7 +60,7 @@ class ECP_Comp_Overleg_OverlegModel extends ECP_Comp_Overleg_Model {
         $this->overleg = new OverlegGewoon();
     }
 
-    public function setAanvraagToOverleg(AanvraagOverleg $aanvraag, $datum) {
+    public function setAanvraagToOverleg(Patient $patient, $datum) {
         //daar kunnen we de patientcode overnemen vanuit de aanvraag en ook de datum invullen van het overleg
         //de status eveneens instellen
         //locatie
@@ -68,8 +68,6 @@ class ECP_Comp_Overleg_OverlegModel extends ECP_Comp_Overleg_Model {
 
         //Problematiek
         $problematiek = "fysisch";
-        $filter = new DFC(Patient::FIELD_CODE, $aanvraag->getPatientCode());
-        $patient = Patient::findByFilter(self::$db, $filter);
         if ($patient->getType() == "7" || $patient->getType() == "16" || $patient->getType() == "18") {
             $problematiek = "psychisch";
         }
@@ -86,7 +84,7 @@ class ECP_Comp_Overleg_OverlegModel extends ECP_Comp_Overleg_Model {
         //ToegewezenGenre
         $genre = ECPFactory::getApp()->getUser()->getType();
 
-        $this->overleg->setPatientCode($aanvraag->getPatientCode())
+        $this->overleg->setPatientCode($patient->getCode())
                       ->setDatum($datum)
                         ->setLocatie($locatie)
                     ->setSoortProblematiek($problematiek)
@@ -100,7 +98,10 @@ class ECP_Comp_Overleg_OverlegModel extends ECP_Comp_Overleg_Model {
         //de aanvraag mag geupdated worden met status naar overleg...
         //en we geven ook mee welk overleg hiermee gekoppeld is...
         try {
-            $update = $this->overleg->insertIntoDatabase(self::$db);
+            $update[] = $this->overleg->insertIntoDatabase(self::$db);
+            $menos = new OverlegMenos();
+            $menos->startOmb()->createOmbFromOverleg(self::$db->lastInsertId());
+            $update[] = $menos->insertIntoDatabaseOmb(self::$db);
             return true;
         } catch (Exception $e) {
             ecpexit('{"succes":"negative","message":"Helaas ... Fout:' . htmlentities($e->getMessage()) . '"}');

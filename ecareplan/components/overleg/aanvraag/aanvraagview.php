@@ -21,13 +21,13 @@ class ECP_Comp_Overleg_AanvraagView extends ECP_Comp_Overleg_View{
             $this->content = "Deze pati&euml;nt blijkt geen aanvraag te hebben! <a onclick='EQ.reRoute(\"overleg\",true)'>Keer terug naar patientenlijst. (Ook om er een aan te maken)</a>";
             $this->export();
         } else {
-            print_r($aanvraag);
+            //print_r($aanvraag);
             $content = "<div class='box'>
                             <h5>Pati&euml;ntinfo</h5>
                             <p>
-                            Rijksregisternummer: {$aanvraag[0]['rijksregister']} <br/>
-                            Volgnummer: SO98 - {$aanvraag[0]['code']} <br/>
-                            Pati&euml;ntnaam: {$aanvraag[0]['naam']} <br/>
+                            Rijksregisternummer: aanvraag[0]['rijksregister'] <br/>
+                            Volgnummer: SO98 - aanvraag[0]['code'] <br/>
+                            Pati&euml;ntnaam: aanvraag[0]['naam'] <br/>
                             </p><h5>Gegevens Aanvrager</h5>
                             <p>
                             Aanvrager: mr x<br/>
@@ -38,7 +38,7 @@ class ECP_Comp_Overleg_AanvraagView extends ECP_Comp_Overleg_View{
             $content.="Datum (dd/mm/jjjj): ".ECPFactory::getForm("aanvraagplannen")->getHtml("normal", array("datum"=>"01/01/2013","submit"=>"Plannen"))
                     ."</div>";
 
-            $script = ECPFactory::getForm("aanvraagplannen")->getScript("/listelfinal/ecareplan/overleg/aanvraagplannen/{$aanvraag[0]['id']}", array("title" => "Plannen...",
+            $script = ECPFactory::getForm("aanvraagplannen")->getScript("/listelfinal/ecareplan/overleg/aanvraagplannen/{$aanvraag->getId()}", array("title" => "Plannen...",
             "action" => "Bezig met plannen...",
             "succes" => "Het overleg is nu geplanned! Je kan het nu bewerken. <br/><img src=\'/listelfinal/lib/images/flat-loader.gif\' />",
             "fail" => "Er is iets misgegaan. Probeer opnieuw!"), "EQ.reRoute('overleg');");

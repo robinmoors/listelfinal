@@ -19,7 +19,7 @@ class OverlegGewoon extends Overlegbasis{
 
 class OverlegMenos extends Overlegbasis{
     use OverlegOmbTrait;
-    
+    public static $db;
     public function startOmb(){
         self::$db = ECPFactory::getPDO("Overleggen");
         return new OverlegMenos();
@@ -38,6 +38,7 @@ class OverlegMenos extends Overlegbasis{
         $omb = new OverlegMenos();
         $omb->assignByHashOmb($array);
         return $omb;
+        //return $result[0];
     }
     
     /**

@@ -209,7 +209,7 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                     if($error[0]){
                         //de waarde = 1 dus validatie was goed :)
                         //Nu kijken of er al overleggen bestaan (voor gegevens) en of er een overleg ook op die datum staat (wat niet mag)
-                        $datum = ECPFactory::getForm("aanvraagoverleg")->datum->value;
+                        $datum = $_POST['datum'];
                         if($this->model->getOverlegByDatum($datum,true)){
                             //we hadden bij de test het object gevraagd = sneller resultaat omdat er geen omzetting gebeurd (terzijde)
                             
@@ -244,7 +244,13 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                                     //bwa der is geen bestaand overleg en tp plan moest niet..
                         }
                         //dan gaan we de aanvraag omzetten naar een overleg!! 
-                        $aanmod->setAanvraagToOverleg($aanvraag, $datum);
+                        ecpimport("components.overleg.overleg.overlegmodel");
+                        $vrmod = new ECP_Comp_Overleg_OverlegModel(0);
+                        ecpimport("components.overleg.patient.patientmodel");
+                        $patmod = new ECP_Comp_Overleg_PatientModel(0);
+                        $patient = $patmod->getPatientByCode($aanvraag->getPatientCode(), true);
+                        $vrmod->setAanvraagToOverleg($patient, $datum);
+                        $aanmod->setAanvraagToOverleg($datum);
                         ecpexit('{"succes":"positive","message":"De opgegeven waarde was fout!"}');
                     }else{
                         //validatie niet ok..

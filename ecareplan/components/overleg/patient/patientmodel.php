@@ -54,6 +54,24 @@ class ECP_Comp_Overleg_PatientModel extends ECP_Comp_Overleg_Model {
         }
         return self::resultToArray($result, Patient::getFieldNames());
     }
+    
+    /**
+     * Haal de patient up via zijn Code
+     * @param integer $code de pat_code
+     * @param boolean $getobject true als je het object wilt, leeg(false) voor een array van het resultaat
+     * @return \Patient|Array|null afhankelijk van de gegeven boolean en null bij geen resultaat!
+     */
+    public function getPatientByCode($code, $getobject = false) {
+        $this->patient->setCode($code);
+        $result = Patient::findByExample(self::$db, $this->patient);
+        if ($getobject) {
+            if (count($result) < 1)
+                return null;
+            else
+                return $result[0];
+        }
+        return self::resultToArray($result, Patient::getFieldNames());
+    }
 
     /**
      * Haal de patientToewijzing op (id nodig) en return wat die toewijzing is (of het hele object/naam van het resultaat)

@@ -31,6 +31,7 @@ class ECP_FormObj {
      */
     public function insert($value) {
         $this->value = filter_var($value, FILTER_SANITIZE_FULL_SPECIAL_CHARS);   //trim($value);
+        echo "value::".$this->value;
         return $this;
     }
 
