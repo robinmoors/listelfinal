@@ -151,6 +151,10 @@ class ECP_User extends ECP_Object implements ECP_FactoryInterface{
         }
     }
     
+    public function getType(){
+        return $this->user['profiel'];
+    }
+    
     public function setUser($id){
         $db = ECPFactory::getDbo();
         

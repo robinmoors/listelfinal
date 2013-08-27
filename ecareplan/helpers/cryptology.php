@@ -16,6 +16,20 @@ class ECP_Cryptology extends ECP_Object{
     public function __CONSTRUCT(){
         
     }
+    
+    /**
+     * Generate a random string
+     * @param int $length The length of the integer
+     * @return string
+     */
+    public static function generateString($length){
+        $string='';
+        $strar="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        for($i=0; $i<$length; $i++){
+            $string.=$strar[rand(0,51)];
+        }
+       return $string;
+    }
     /**
      * Generate a random integer (no leading 0)
      * @param int $length The length of the integer
