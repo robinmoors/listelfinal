@@ -267,7 +267,7 @@ trait OverlegOmbTrait {
                     return null;
             }
             $omb = new OverlegMenos();
-            $omb->assignByHash($result);
+            $omb->assignByHashOmb($result);
             return $omb;
         }
         
@@ -291,7 +291,7 @@ trait OverlegOmbTrait {
                     return null;
             }
             $omb = new OverlegMenos();
-            $omb->assignByHash($result);
+            $omb->assignByHashOmb($result);
             return $omb;
         }
         

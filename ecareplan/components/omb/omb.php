@@ -68,6 +68,9 @@ class ECP_Comp_Omb_Controller implements ECP_ComponentController {
         //$this->test3();
         //$this->test4();
         //$this->test5();
+        //$this->test1a();
+        //$this->test3a();
+        $this->test4a();
     }
     
     public function nieuw(){
@@ -114,16 +117,25 @@ class ECP_Comp_Omb_Controller implements ECP_ComponentController {
      */
     private function test1(){
         self::$db = ECPFactory::getPDO("Overleggen");
-        $overlegId = "433";
-        //$omb = $this->model->createOmbFromOverleg($overlegId);
-        //$omb->insertIntoDatabaseOmb(self::$db);
-            
+        $overlegId = "1";
         $ombFactuur = "9/9/9999";
         $ombActief = "1";
         $ombRangorde = "1";
-        $omb2 = $this->model->createOmbFromOverleg($overlegId, $ombFactuur, $ombActief, $ombRangorde);
+        $omb2 = OverlegMenos::createOmbFromOverleg($overlegId, $ombFactuur, $ombActief, $ombRangorde);
         $omb2->insertIntoDatabaseOmb(self::$db);
             
+    }
+    
+    private function test1a(){
+        self::$db = ECPFactory::getPDO("Overleggen");
+        $overlegId = 2;
+        $tpVerslag= "verslag";
+        $tpAuteur = "TP";
+        $tpPartner = "partner";
+        $tpRechtenoc = 1;
+        $tp2 = OverlegTp::createTpFromOverleg($overlegId, $tpVerslag, $tpAuteur, $tpNieuwePartners, $tpRechtenoc);
+        $tp2->insertIntoDatabaseTp(self::$db);
+        
     }
     
     /*
@@ -146,16 +158,32 @@ class ECP_Comp_Omb_Controller implements ECP_ComponentController {
     }
     
     private function test3(){
-        $overlegId = "99";
-        $omb = $this->model->getOverlegMenos($overlegId);
+        self::$db = ECPFactory::getPDO("Overleggen");
+        $overlegId = "1";
+        $omb = OverlegMenos::getOverlegMenos($overlegId);
+        print_r($omb);
+    }
+    
+    private function test3a(){
+        self::$db = ECPFactory::getPDO("Overleggen");
+        $overlegId = "2";
+        $tp = OverlegTp::getOverlegTp($overlegId);
+        print_r($tp);
     }
     
     /*
      * een overleg verwijderen (zowel omb als overlegGewoon)
      */
     private function test4(){
-        $overlegId = "432";
-        $this->model->deleteOverlegMenos($overlegId, TRUE);
+        $overlegId = "1";
+        self::$db = ECPFactory::getPDO("Overleggen");
+        OverlegMenos::deleteOverlegMenos($overlegId, TRUE);
+    }
+    
+    private function test4a(){
+        $overlegId = "2";
+        self::$db = ECPFactory::getPDO("Overleggen");
+        OverlegTp::deleteOverlegTp($overlegId, TRUE);
     }
     
     /*

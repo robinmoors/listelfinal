@@ -1258,7 +1258,6 @@ class Overlegbasis extends Db2PhpEntityBase implements Db2PhpEntityModificationT
 	public function deleteFromDatabase(PDO $db) {
             $stmt=self::prepareStatement($db,self::SQL_DELETE_PK);
             $stmt->bindValue(1,$this->getId());
-            echo "parent_id: $this->getId";
             $affected=$stmt->execute();
             if (false===$affected) {
                     $stmt->closeCursor();

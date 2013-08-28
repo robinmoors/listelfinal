@@ -17,9 +17,13 @@ class OverlegGewoon extends Overlegbasis{
     
 }
 
+/**
+ * * Uitgeschreven en operationeel
+ */
 class OverlegMenos extends Overlegbasis{
     use OverlegOmbTrait;
     public static $db;
+    
     public function startOmb(){
         self::$db = ECPFactory::getPDO("Overleggen");
         return new OverlegMenos();
@@ -30,7 +34,7 @@ class OverlegMenos extends Overlegbasis{
      * @param type $overlegId
      * @return type OverlegMenos
      */
-    private function findByIdAndConvert($overlegId){
+    private static function findByIdAndConvert($overlegId){
         self::$db = ECPFactory::getPDO("Overleggen");
         $result = Overlegbasis::findById(self::$db, $overlegId); 
         $array = $result->toHash();
@@ -49,8 +53,8 @@ class OverlegMenos extends Overlegbasis{
      * @param type $ombRangorde
      * @return type OverlegMenos
      */
-    public function createOmbFromOverleg($overlegId,$ombFactuur=NULL,$ombActief=NULL,$ombRangorde=NULL){
-        $omb = $this->findByIdAndConvert($overlegId);
+    public static function createOmbFromOverleg($overlegId,$ombFactuur=NULL,$ombActief=NULL,$ombRangorde=NULL){
+        $omb = self::findByIdAndConvert($overlegId);
         if($omb){
             $omb->setOverlegId($omb->getId())
                 ->setOmbFactuur($ombFactuur)
@@ -60,8 +64,13 @@ class OverlegMenos extends Overlegbasis{
         }
     }
     
-    public function getOverlegMenos($overlegId){
-        $omb = $this->findByIdAndConvert($overlegId);
+    /**
+     * Geeft een heel object OverlegMenos terug (bundelt 2 tabellen)
+     * @param type $overlegId
+     * @return type OverlegMenos $omb
+     */
+    public static function getOverlegMenos($overlegId){
+        $omb = self::findByIdAndConvert($overlegId);
         $omb2 = OverlegMenos::findByOverleg(self::$db, $overlegId);
         $omb->setUid($omb2->getUid())
         ->setOverlegId($omb2->getOverlegId())
@@ -71,8 +80,13 @@ class OverlegMenos extends Overlegbasis{
         return $omb;
     }
     
-    public function deleteOverlegMenos($overlegId,$parent){
-        $omb = $this->getOverlegMenos($overlegId);
+    /**
+     * Delete de ombregistratie en/of overleg
+     * @param type $overlegId
+     * @param type $parent ook het overleg delete?
+     */
+    public static function deleteOverlegMenos($overlegId,$parent){
+        $omb = OverlegMenos::getOverlegMenos($overlegId);
         if($omb){
             $omb->deleteFromDatabaseOmb(self::$db,$parent);
         }
@@ -128,7 +142,83 @@ Class OverlegPsy2013 extends Overlegbasis{
 }
  * */
 
+/**
+ * Uitgeschreven en operationeel
+ */
 class OverlegTp extends Overlegbasis{
     use OverlegTpTrait;
+    
+    public static $db;
+    
+    public function startTp(){
+        self::$db = ECPFactory::getPDO("Overleggen");
+        return new OverlegTp();
+    }
+    
+    /**
+     * Zoekt een overleg en maakt er een nieuw overlegTp van
+     * @param type $overlegId
+     * @return type OverlegTp
+     */
+    private static function findByIdAndConvert($overlegId){
+        self::$db = ECPFactory::getPDO("Overleggen");
+        $result = Overlegbasis::findById(self::$db, $overlegId); 
+        $array = $result->toHash();
+
+        $tp = new OverlegTp();
+        $tp->assignByHashTp($array);
+        return $tp;
+    }
+    
+    /**
+     * 
+     * @param type $overlegId
+     * @param type $tpVerslag
+     * @param type $tpAuteur
+     * @param type $tpNieuwePartners
+     * @param type $tpRechtenoc
+     * @return type
+     */
+    public static function createTpFromOverleg($overlegId,$tpVerslag=NULL,$tpAuteur=NULL,$tpNieuwePartners=NULL,$tpRechtenoc=NULL){
+        $tp = self::findByIdAndConvert($overlegId);
+        if($tp){
+            $tp->setOverlegId($tp->getId())
+                ->setTpVerslag($tpVerslag)
+                ->setTpAuteur($tpAuteur)
+                ->setTpNieuwepartners($tpNieuwePartners)
+                ->setTpRechtenoc($tpRechtenoc);
+            return $tp;
+        }
+       
+    }
+    
+    /**
+     * Geeft een heel object OverlegTp terug (bundelt 2 tabellen)
+     * @param type $overlegId
+     * @return type OverlegTp $tp
+     */
+    public static function getOverlegTp($overlegId){
+        $tp = self::findByIdAndConvert($overlegId);
+        $tp2 = OverlegTp::findByOverlegTp(self::$db, $overlegId);
+        $tp->setUid($tp2->getUid())
+                ->setOverlegId($tp->getId())
+                ->setTpVerslag($tp2->getTpVerslag())
+                ->setTpAuteur($tp2->getTpAuteur())
+                ->setTpNieuwepartners($tp2->getTpNieuwePartners())
+                ->setTpRechtenoc($tp2->getTpRechtenoc());
+        return $tp;
+    }
+    
+    /**
+     * Delete de Tp en/of overlegbasis
+     * @param type $overlegId
+     * @param type $parent ook het overleg delete?
+     */
+    public static function deleteOverlegTp($overlegId,$parent){
+        $tp = OverlegTp::getOverlegTp($overlegId);
+        if($tp){
+            $tp->deleteFromDatabaseTp(self::$db,$parent);
+        }
+    }
 }
 ?>

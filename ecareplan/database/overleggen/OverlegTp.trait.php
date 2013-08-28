@@ -297,7 +297,7 @@ trait OverlegTpTrait {
                     return null;
             }
             $tp = new OverlegTp();
-            $tp->assignByHash($result);
+            $tp->assignByHashTp($result);
             return $tp;
         }
         
@@ -320,7 +320,7 @@ trait OverlegTpTrait {
                     return null;
             }
             $tp = new OverlegTp();
-            $tp->assignByHash($result);
+            $tp->assignByHashTp($result);
             return $tp;
         }
 }
