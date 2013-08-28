@@ -54,6 +54,12 @@ class ECP_Form extends ECP_Object implements ECP_FactoryInterface {
             return $this->obj[$fieldname];
         elseif ($fieldname == "name") {
             return $this->name;
+        }elseif($fieldname == "values"){
+            $ar = array();
+            foreach( $this->obj as $obj){
+                $ar[$obj->name] = $obj->value;
+            }
+            return $ar;
         }
         else
             return null;
@@ -319,9 +325,11 @@ class ECP_Form extends ECP_Object implements ECP_FactoryInterface {
                 EQ.OVR.content = '{$txt["action"]}<br/><img src=\'/listel_new/lib/images/flat-loader.gif\' />';
                 EQ.OVR.refresh('c').open();
                 var pname = '{$this->name}completion';";
-        for ($i = 0; $i < count($this->names); $i++) {
-            if ($this->names[$i] != "submit")
-                $script .="var {$this->names[$i]} = document.{$this->name}.{$this->names[$i]}.value.toString();";
+        foreach($this->obj as $field) {
+            if ($field->name != "submit"){
+                if($field->type != "radio") $script .="var {$field->name} = document.{$this->name}.{$field->name}.value.toString();";
+                else $script.="var {$field->name} = EQ.radioValue(document.{$this->name}.{$field->name});";
+            }
         }
         $script .="
                 EQ.CPU.makeProcess({
@@ -367,7 +375,7 @@ class ECP_Form extends ECP_Object implements ECP_FactoryInterface {
                 var b = true;
                 ";
         foreach ($this->obj as $value) {
-            $script.= "if(!EQ.formCheck(document.{$this->name}.{$value->name},{$value->script},'{$this->name}')) b = false;
+        if($value->type!="radio") $script.= "if(!EQ.formCheck(document.{$this->name}.{$value->name},{$value->script},'{$this->name}')) b = false;
                 ";
         }
         $script.="

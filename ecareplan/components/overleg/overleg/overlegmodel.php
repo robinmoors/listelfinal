@@ -42,6 +42,26 @@ class ECP_Comp_Overleg_OverlegModel extends ECP_Comp_Overleg_Model {
                 return self::resultToArray($results, Overlegbasis::getFieldNames());
         }
     }
+    
+    /**
+     * Haal de overleg op via de id en geef het object of het resultaat
+     * @param ID $id
+     * @param boolean $obj Het Object ja of nee? (nee = resultaat in array)
+     * @return null|\Overlegbasis steeds null wanneer leeg resultaat anders het object of het resultaatarray
+     */
+    public function getOverlegById($id, $obj = false) {
+        //Hier regeltjes over welke aanvragen die user nu eigenlijk mag zien...
+        $this->overleg->setId($id);
+        $results = $this->overleg->findByExample(self::$db, $this->overleg);
+        if (empty($results)) {
+            return null;
+        } else {
+            if ($obj)
+                return $results[0];
+            else
+                return self::resultToArray($results, Overlegbasis::getFieldNames());
+        }
+    }
 
     /**
      * Get PDO object from factory and create Patient object, return the last one.
@@ -99,10 +119,26 @@ class ECP_Comp_Overleg_OverlegModel extends ECP_Comp_Overleg_Model {
         //en we geven ook mee welk overleg hiermee gekoppeld is...
         try {
             $update[] = $this->overleg->insertIntoDatabase(self::$db);
-            $menos = new OverlegMenos();
-            $menos->startOmb()->createOmbFromOverleg(self::$db->lastInsertId());
-            $update[] = $menos->insertIntoDatabaseOmb(self::$db);
+            //$menos test
+            // $menos = OverlegMenos::createOmbFromOverleg(self::$db->lastInsertId());
+            // $update[] = $menos->insertIntoDatabaseOmb(self::$db);
+            //
+            //$tp test
+            $tp = OverlegTp::createTpFromOverleg(self::$db->lastInsertId());
+            $update[] = $tp->insertIntoDatabaseTp(self::$db);
             return true;
+        } catch (Exception $e) {
+            ecpexit('{"succes":"negative","message":"Helaas ... Fout:' . htmlentities($e->getMessage()) . '"}');
+        }
+    }
+    
+    public function updateOverleg($overleg, $data){
+        $this->overleg = $overleg;
+        $overlegvalues = $this->overleg->toHash();
+        $newoverleg = array_merge($overlegvalues, $data);
+        $this->overleg->assignByHash($newoverleg);
+        try {
+            $update[] = $this->overleg->updateToDatabase(self::$db);
         } catch (Exception $e) {
             ecpexit('{"succes":"negative","message":"Helaas ... Fout:' . htmlentities($e->getMessage()) . '"}');
         }

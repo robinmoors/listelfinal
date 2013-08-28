@@ -5,6 +5,7 @@
  * and open the template in the editor.
  */
 defined("ECP_AC") or die("Stop! Wat we onder de motorkap hebben zitten houden we liever verborgen.");
+
 class ECP_FormObj_Select extends ECP_FormObj {
 
     protected $select = false;
@@ -93,13 +94,24 @@ class ECP_FormObj_Radio extends ECP_FormObj_Select {
     public function getHtml($formname, $class) {
         $html = "<span class='description {$class}'>{$this->placeholder}</span>";
         $first = true;
-        foreach ($this->options as $key => $value) {
-            if ($first) {
-                $first = false;
-                $html.="<input type='radio' name='{$this->name}' value='$key' class='{$class}' checked='checked'>$value<br/>";
+
+        if ($this->value !== null) {
+            foreach ($this->options as $key => $value) {
+                if ($key == $this->value) {
+                    $html.="<input type='radio' name='{$this->name}' value='$key' class='{$class}' checked='checked'>$value<br/>";
+                } else {
+                    $html.="<input type='radio' name='{$this->name}' value='$key' class='{$class}'>$value<br/>";
+                }
             }
-            else
-                $html.="<input type='radio' name='{$this->name}' value='$key' class='{$class}'>$value<br/>";
+        } else {
+            foreach ($this->options as $key => $value) {
+                if ($first) {
+                    $first = false;
+                    $html.="<input type='radio' name='{$this->name}' value='$key' class='{$class}' checked='checked'>$value<br/>";
+                }
+                else
+                    $html.="<input type='radio' name='{$this->name}' value='$key' class='{$class}'>$value<br/>";
+            }
         }
         $html.="<span id='{$formname}{$this->name}'></span></br>";
         return $html;
@@ -117,4 +129,5 @@ class ECP_FormObj_Hulpverlener extends ECP_FormObj_Input {
     }
 
 }
+
 ?>

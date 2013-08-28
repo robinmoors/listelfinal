@@ -65,6 +65,27 @@ class ECP_Comp_Overleg_AanvraagModel extends ECP_Comp_Overleg_Model {
                 return self::resultToArray($results, AanvraagOverleg::getFieldNames());
         }
     }
+    
+    /**
+     * Haal de overleg aanvraag op via de overlegid en geef het object of het resultaat
+     * @param OverlegID $id
+     * @param boolean $obj Het Object ja of nee? (nee = resultaat in array)
+     * @return null|\AanvraagOverleg steeds null wanneer leeg resultaat anders het object of het resultaatarray
+     */
+    public function getAanvraagByOverlegId($id, $obj = false) {
+        $this->aanvraag->setOverlegId($id);
+        $results = $this->aanvraag->findByExample(self::$db, $this->aanvraag);
+        if (empty($results)) {
+            return null;
+        } else {
+            if ($obj) {
+                $this->aanvraag = $results[0];
+                return $results[0];
+            }
+            else
+                return self::resultToArray($results, AanvraagOverleg::getFieldNames());
+        }
+    }
 
     /**
      * Get PDO object from factory and create Patient object, return the last one.
@@ -102,7 +123,7 @@ class ECP_Comp_Overleg_AanvraagModel extends ECP_Comp_Overleg_Model {
 
         //de aanvraag mag geupdated worden met status naar overleg...
         //en we geven ook mee welk overleg hiermee gekoppeld is...
-        $this->aanvraag->setStatus("overleg")->setRedenStatus("overleg gepland");
+        $this->aanvraag->setStatus("overleg")->setRedenStatus("overleg gepland")->setOverlegId(self::$db->lastInsertId());
         try {
             $update = $this->aanvraag->updateToDatabase(self::$db);
             return true;

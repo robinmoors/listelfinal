@@ -15,6 +15,7 @@ class ECP_FormObj {
     protected $script;
 
     public function __CONSTRUCT($fieldname = false) {
+        $this->value = null;
         if (!$fieldname)
             $this->name = "field";
         else
@@ -31,7 +32,7 @@ class ECP_FormObj {
      */
     public function insert($value) {
         $this->value = filter_var($value, FILTER_SANITIZE_FULL_SPECIAL_CHARS);   //trim($value);
-        echo "value::".$this->value;
+        //echo "value::".$this->value;
         return $this;
     }
 
