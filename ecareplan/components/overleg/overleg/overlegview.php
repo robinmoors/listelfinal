@@ -22,46 +22,22 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
 
         $keys = array('id', 'patient_code', 'rijksregister', 'naam_aanvrager', 'timestamp');
         $keysnamed = array('#', 'Patient Code', 'Rijksregister', 'Aanvrager', 'Datum aanvraag');
+        ecpimport("template.helper.datatotable");
+        $aanvraagtable = new ECP_TemplateHelper_DataToTable($aanvragen);
+        $aanvraagtable->setEmpty("<em>Geen aanvragen beschikbaar om te plannen. Dien een nieuwe aanvraag in om een overleg te plannen.</em>");
+        $overlegtable = new ECP_TemplateHelper_DataToTable($overleggen);
+        $overlegtable->setEmpty("<em>Geen overleggen beschikbaar om te bewerken of af te ronden. Dien een nieuwe aanvraag in of plan een overleg via een bestaande aanvraag.</em>");
         $this->setState("content.start");
 
         $this->setState("aanvraag.start");
-        $content = "<h4>Aanvragen</h4><br/><a class='RoundedButton2 login' href='' onclick='EQ.reRoute(\"overlegnieuw\",true);'>Nieuwe aanvraag indienen</a><br/><table id='ShowTable' class='wider'><tr id='TableHead'>";
-        for ($i = 0; $i < count($keys); $i++) {
-            $content.="<td>{$keysnamed[$i]}</td>";
-        }
-        $content.="</tr>";
-        if ($aanvragen != null) {
-            foreach ($aanvragen as $patient) {
-                $content.="<tr id='TableRow' onclick='EQ.reRoute(\"aanvraagplan\",true,{$patient['id']});'>";
-                for ($i = 0; $i < count($keys); $i++) {
-                    $content.="<td>{$patient[$keys[$i]]}</td>";
-                }
-            }
-        } else {
-            $content.="<tr id='TableRow'><td colspan='" . count($keys) . "'><em>Geen aanvragen beschikbaar om te plannen. Dien een nieuwe aanvraag in om een overleg te plannen.</em></td></tr>";
-        }
-        $content.="</table>";
+        $content = "<h4>Aanvragen</h4><br/><a class='RoundedButton2 login' href='' onclick='EQ.reRoute(\"overlegnieuw\",true);'>Nieuwe aanvraag indienen</a><br/>".
+        $aanvraagtable->get($keys,$keysnamed,"wider","EQ.reRoute(\"aanvraagplan\",true,{[id]});");
         $this->stack = $content;
         $this->setState("aanvraag.end");
         $this->moveToContent();
 
         $this->setState("overleg.start");
-        $content = "<h4>Overleggen</h4><br/><table id='ShowTable' class='wider'><tr id='TableHead'>";
-        for ($i = 0; $i < count($keys); $i++) {
-            $content.="<td>{$keysnamed[$i]}</td>";
-        }
-        $content.="</tr>";
-        if ($overleggen != null) {
-            foreach ($overleggen as $patient) {
-                $content.="<tr id='TableRow' onclick='EQ.reRoute(\"overlegbewerk\",true,{$patient['id']});'>";
-                for ($i = 0; $i < count($keys); $i++) {
-                    $content.="<td>{$patient[$keys[$i]]}</td>";
-                }
-            }
-        } else {
-            $content.="<tr id='TableRow'><td colspan='" . count($keys) . "'><em>Geen aanvragen beschikbaar om te plannen. Dien een nieuwe aanvraag in om een overleg te plannen.</em></td></tr>";
-        }
-        $content.="</table>";
+        $content = $overlegtable->get($keys,$keysnamed,"wider","EQ.reRoute(\"overlegbewerk\",true,{[id]});");
         $this->stack = $content;
         $this->setState("overleg.end");
         $this->moveToContent();
