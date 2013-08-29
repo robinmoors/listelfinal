@@ -63,11 +63,11 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
         //aanvragen opsporen
         ecpimport("components.overleg.aanvraag.aanvraagmodel");
         $aanmod = new ECP_Comp_Overleg_AanvraagModel(0);
-        $aanvragen = $aanmod->getAanvraagByUser(0);
+        $aanvragen = $aanmod->getAanvraagByUser($this->user->getId());
         //overleggen opsporen
         ecpimport("components.overleg.overleg.overlegmodel");
         $vrmod = new ECP_Comp_Overleg_OverlegModel(0);
-        $overleggen = $vrmod->getOverlegByUser(0);
+        $overleggen = $vrmod->getOverlegByUser($this->user->getId());
         //view laden
         ecpimport("components.overleg.overleg.overlegview");
         $vrview = new ECP_Comp_Overleg_OverlegView($this->app);

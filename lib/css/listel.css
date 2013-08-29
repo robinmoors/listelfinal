@@ -224,6 +224,12 @@ nav ul{
 }.tappage.tapdefault{
     display:block;
 }
+.wrapped{
+    border-top: 1px #FFBD40 groove;
+}
+.box.wrapped{
+    margin-top: 0;
+}
 
 /* tabs */
 ul.tabinterface{

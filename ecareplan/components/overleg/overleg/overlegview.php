@@ -6,77 +6,82 @@
  */
 defined("ECP_AC") or die("Stop! Wat we onder de motorkap hebben zitten houden we liever verborgen.");
 
-class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View{
+class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
+
     public function __CONSTRUCT($app) {
         parent::__CONSTRUCT($app);
         $this->setState("overleg.constructed");
     }
-    
+
     public function __destruct() {
         $this->setState("overleg.destructed");
     }
-    
-     public function viewList($aanvragen,$overleggen) {
+
+    public function viewList($aanvragen, $overleggen) {
         $this->setState("viewlist.start"); //naam.actie!
-        
+
         $keys = array('id', 'patient_code', 'rijksregister', 'naam_aanvrager', 'timestamp');
         $keysnamed = array('#', 'Patient Code', 'Rijksregister', 'Aanvrager', 'Datum aanvraag');
         $this->setState("content.start");
-        
+
         $this->setState("aanvraag.start");
         $content = "<h4>Aanvragen</h4><br/><a class='RoundedButton2 login' href='' onclick='EQ.reRoute(\"overlegnieuw\",true);'>Nieuwe aanvraag indienen</a><br/><table id='ShowTable' class='wider'><tr id='TableHead'>";
         for ($i = 0; $i < count($keys); $i++) {
             $content.="<td>{$keysnamed[$i]}</td>";
         }
         $content.="</tr>";
-        if($aanvragen!=null){
-        foreach ($aanvragen as $patient) {
-            $content.="<tr id='TableRow' onclick='EQ.reRoute(\"aanvraagplan\",true,{$patient['id']});'>";
-            for ($i = 0; $i < count($keys); $i++) {
-                $content.="<td>{$patient[$keys[$i]]}</td>";
+        if ($aanvragen != null) {
+            foreach ($aanvragen as $patient) {
+                $content.="<tr id='TableRow' onclick='EQ.reRoute(\"aanvraagplan\",true,{$patient['id']});'>";
+                for ($i = 0; $i < count($keys); $i++) {
+                    $content.="<td>{$patient[$keys[$i]]}</td>";
+                }
             }
-        }
-        }else{
-            $content.="<tr id='TableRow'><td colspan='".count($keys)."'><em>Geen aanvragen beschikbaar om te plannen. Dien een nieuwe aanvraag in om een overleg te plannen.</em></td></tr>";
+        } else {
+            $content.="<tr id='TableRow'><td colspan='" . count($keys) . "'><em>Geen aanvragen beschikbaar om te plannen. Dien een nieuwe aanvraag in om een overleg te plannen.</em></td></tr>";
         }
         $content.="</table>";
-        $this->stack=$content;
+        $this->stack = $content;
         $this->setState("aanvraag.end");
         $this->moveToContent();
-        
+
         $this->setState("overleg.start");
         $content = "<h4>Overleggen</h4><br/><table id='ShowTable' class='wider'><tr id='TableHead'>";
         for ($i = 0; $i < count($keys); $i++) {
             $content.="<td>{$keysnamed[$i]}</td>";
         }
         $content.="</tr>";
-        if($overleggen!=null){
-        foreach ($overleggen as $patient) {
-            $content.="<tr id='TableRow' onclick='EQ.reRoute(\"overlegbewerk\",true,{$patient['id']});'>";
-            for ($i = 0; $i < count($keys); $i++) {
-                $content.="<td>{$patient[$keys[$i]]}</td>";
+        if ($overleggen != null) {
+            foreach ($overleggen as $patient) {
+                $content.="<tr id='TableRow' onclick='EQ.reRoute(\"overlegbewerk\",true,{$patient['id']});'>";
+                for ($i = 0; $i < count($keys); $i++) {
+                    $content.="<td>{$patient[$keys[$i]]}</td>";
+                }
             }
-        }
-        }else{
-            $content.="<tr id='TableRow'><td colspan='".count($keys)."'><em>Geen aanvragen beschikbaar om te plannen. Dien een nieuwe aanvraag in om een overleg te plannen.</em></td></tr>";
+        } else {
+            $content.="<tr id='TableRow'><td colspan='" . count($keys) . "'><em>Geen aanvragen beschikbaar om te plannen. Dien een nieuwe aanvraag in om een overleg te plannen.</em></td></tr>";
         }
         $content.="</table>";
-        $this->stack=$content;
+        $this->stack = $content;
         $this->setState("overleg.end");
         $this->moveToContent();
-        
+
         $this->setState("content.end");
-        
+
         $this->title = "Patientenlijst";
         $this->moveToContent();
-        
+
         $this->setState("viewlist.end");
         $this->export();
     }
-    
+
     public function editOverleg($overleg, $patient, $aanvraag, $form) {
+        $this->title = "Overleg bewerken";
         if ($overleg === null || $overleg === false) {
-            $this->content = "Deze pati&euml;nt blijkt geen overleggen te hebben! <a onclick='EQ.reRoute(\"overleg\",true)'>Keer terug naar patientenlijst. (Ook om er een aan te maken)</a>";
+            $this->content = "Het overleg werd niet gevonden! <a onclick='EQ.reRoute(\"overleg\",true)'>Keer terug naar aanvragen en overleggen.</a>";
+            $this->export();
+        } elseif ($aanvraag === null) {
+            $this->content = "Dit overleg werd gepland zonder bijhorende aanvraag!<br/>Het is noodzakelijk voor een overleg om vanuit een aanvraag te vertrekken. <a onclick='EQ.reRoute(\"overleg\",true)'>Keer terug naar aanvragen en overleggen.</a>";
             $this->export();
         } else {
             $content = "<div class='box'>
@@ -102,7 +107,7 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View{
                                 <div id='basis' class='tappage tapdefault'>
                                 <h5>Basisgegevens:</h5><br/>";
             $content.=$form[0]->getHtml("normal", array("locatie" => "Plaats van het overleg:<br/>", "aanwezig" => "Wie is er aanwezig op het overleg?<br/>", "instemming" => "Instemming met de deelnemers van het overleg. De pati&euml;nt of vertegenwoordiger?<br/>"))
-                    ."</div><div id='team' class='tappage'>
+                    . "</div><div id='team' class='tappage'>
                                 <h5>Teamoverleg:</h5><br/>
                                 Hier komt een tabel met teamleden - hun rechten - teamleider.
                       </div><div id='attest' class='tappage'>
@@ -112,37 +117,29 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View{
                       </div><div id='afdruk' class='tappage'>
                                 <h5>Afdrukpagina</h5>
                       </div></div>";
-        }
-
-
-            $this->title = "Overleg bewerken";
             $this->content = $content;
-            $script = self::createTabScript(array("basis","team","attest","taak","afdruk")).
-                    $form[0]->getScript("/listelfinal/ecareplan/overleg/bewerkopslaan/{$overleg->getId()}",
-                            array("title"=>"Basisgegevens opslaan","action"=>"Bezig met opslaan..."),
-                            "EQ.OVR.close();",
-                            "",
-                            "else if(json.message){
+            $script = self::createTabScript(array("basis", "team", "attest", "taak", "afdruk")) .
+                    $form[0]->getScript("/listelfinal/ecareplan/overleg/bewerkopslaan/{$overleg->getId()}", array("title" => "Basisgegevens opslaan", "action" => "Bezig met opslaan..."), "EQ.OVR.close();", "", "else if(json.message){
                                 EQ.OVR.content=json.message; EQ.OVR.refresh('c');
                             }");
             $this->script = $script;
             $this->export();
         }
-        
-        
-        private static function createTabScript($pages=array()){
-        $h="";
-        for($i=0; $i<count($pages); $i++){
+    }
+
+    private static function createTabScript($pages = array()) {
+        $h = "";
+        for ($i = 0; $i < count($pages); $i++) {
             $h.="$('#{$pages[$i]}-but').bind('click',function(){EQ.change('{$pages[$i]}')});";
         }
         $h.="EQ.pages=[";
-        for($i=0; $i<count($pages);$i++){
+        for ($i = 0; $i < count($pages); $i++) {
             $h.="'{$pages[$i]}'";
-            if(count($pages)>($i+1)) $h.=",";
+            if (count($pages) > ($i + 1))
+                $h.=",";
         }
         $h.="]";
-        return $h; 
+        return $h;
     }
-    
-    
+
 }
