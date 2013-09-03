@@ -50,8 +50,22 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
         $this->setState("viewlist.end");
         $this->export();
     }
+    
+    private function tabbladTeam($betrokkenen,$id){
+        if($betrokkenen === null){
+            $html = "<h4>Dokters <img src='/listelfinal/lib/images/Doctor.png' onclick='EQ.getPopup(\"doktors\",$id);'/></h4>
+                     <h4>Mantelzorgers <img src='/listelfinal/lib/images/Doctor-Nurse.png' onclick='EQ.getPopup(\"mantelzorgers\",$id);'/><h4>";
+            return $html;
+        }else{
+            foreach($betrokkenen as $betrokken){
+                $h = "bl";
+            }
+            return "vol";
+        }
+    }
 
-    public function editOverleg($overleg, $patient, $aanvraag, $form) {
+    public function editOverleg($overleg, $patient, $aanvraag, $form, $betrokkenen) {
+        $teamcode = $this->tabbladTeam($betrokkenen,$overleg->getId());
         $this->title = "Overleg bewerken";
         if ($overleg === null || $overleg === false) {
             $this->content = "Het overleg werd niet gevonden! <a onclick='EQ.reRoute(\"overleg\",true)'>Keer terug naar aanvragen en overleggen.</a>";
@@ -73,19 +87,19 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
                             Doel: het doel
                     </div><div class='box selfclear'>
                             <ul class='tabinterface'>
-                            <li class='selected' id='basis-but'>Basisgegevens</li>
-                            <li id='team-but'>Teamoverleg</li>
+                            <li id='basis-but'>Basisgegevens</li>
+                            <li class='selected' id='team-but'>Teamoverleg</li>
                             <li id='attest-but'>Attesten en bijlagen</li>
                             <li id='taak-but'>Taakfiches</li>
                             <li id='afdruk-but'>Afdrukpagina</li>
                             </ul>
                           </div><div class='box wrapped'>
-                                <div id='basis' class='tappage tapdefault'>
+                                <div id='basis' class='tappage'>
                                 <h5>Basisgegevens:</h5><br/>";
             $content.=$form[0]->getHtml("normal", array("locatie" => "Plaats van het overleg:<br/>", "aanwezig" => "Wie is er aanwezig op het overleg?<br/>", "instemming" => "Instemming met de deelnemers van het overleg. De pati&euml;nt of vertegenwoordiger?<br/>"))
-                    . "</div><div id='team' class='tappage'>
+                    . "</div><div id='team' class='tappage tapdefault'>
                                 <h5>Teamoverleg:</h5><br/>
-                                Hier komt een tabel met teamleden - hun rechten - teamleider.
+                                $teamcode
                       </div><div id='attest' class='tappage'>
                                 <h5>Attesten en bijlagen</h5>
                       </div><div id='taak' class='tappage'>

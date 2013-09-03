@@ -253,21 +253,24 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
 
     public function bewerk() {
         //om te bewerken moet de overlegID gegeven zijn!
-        ecpimport("components.overleg.overleg.overlegmodel");
+        ecpimport("components.overleg.overleg.overlegmodel"); //overleggen
         $vrmod = new ECP_Comp_Overleg_OverlegModel(0);
-        ecpimport("components.overleg.patient.patientmodel");
+        ecpimport("components.overleg.patient.patientmodel"); //patienten
         $patmod = new ECP_Comp_Overleg_PatientModel(0);
-        ecpimport("components.overleg.aanvraag.aanvraagmodel");
+        ecpimport("components.overleg.aanvraag.aanvraagmodel");//aanvragen
         $aanmod = new ECP_Comp_Overleg_AanvraagModel(0);
-        ecpimport("components.overleg.overleg.overlegform");
+        ecpimport("components.overleg.andere.andermodel"); //andere (betrokkenen etc)
+        $andmod = new ECP_Comp_Overleg_AnderModel();
+        ecpimport("components.overleg.overleg.overlegform"); //formulier
         $vrform = new ECP_Comp_Overleg_OverlegForm();
-        ecpimport("components.overleg.overleg.overlegview");
+        ecpimport("components.overleg.overleg.overlegview"); //view
         $vrview = new ECP_Comp_Overleg_OverlegView($this->app);
 
         $overleg = $vrmod->getOverlegById($this->vars[0], true);
         if ($overleg) {
             $patient = $patmod->getPatientByCode($overleg->getPatientCode(), true);
             $aanvraag = $aanmod->getAanvraagByOverlegId($overleg->getId(), true);
+            $betrokkenen = $andmod->getBetrokkenenByPatientCode($overleg->getPatientCode(),2); //geen object, maar lijst van!!
         }
         if(!$overleg){
             $this->std_command();
@@ -278,7 +281,7 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
         $form[0] = $vrform->getBasis();
         $form[0]->smartInsert($overlegvalues);
 
-        $vrview->editOverleg($overleg, $patient, $aanvraag, $form);
+        $vrview->editOverleg($overleg, $patient, $aanvraag, $form, $betrokkenen);
     }
 
     public function bewerkopslaan() {
@@ -298,6 +301,66 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                     $vrmod->updateOverleg($overleg, $form[0]->values);
                     ecpexit('{"succes":"positive","message":"ok"}');
                 }
+                
+            } else {
+                ecpexit('{"succes":"negative","message":"Oeps :s<br/>De server kreeg niet alle gegevens mee.."}');
+            }
+        } else {
+            $this->std_command();
+        }
+    }
+    
+    /**
+     *  lijst ophalen van dokters voor overleg
+     */
+    
+    public function bewerkvoegdocs(){
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+            if ($this->vars[0]) {
+                ecpimport("components.overleg.overleg.overlegmodel");
+                $vrmod = new ECP_Comp_Overleg_OverlegModel(0);
+
+                $overleg = $vrmod->getOverlegById($this->vars[0], true);
+                if(!$overleg) ecpexit ('{"succes":"negative","error":"Oeps :s<br/>De server weet niet voor welk overleg hij dokters moet zoeken..."}');
+                
+                ecpimport("components.overleg.andere.andermodel");
+                $andmod = new ECP_Comp_Overleg_AnderModel();
+                $dokters = $andmod->getNietBetrokkenDokters($overleg->getPatientCode());
+                $docs = array();
+                foreach($dokters as $dokter){
+                    $docs[] = array("naam"=>$dokter["naam"].",".$dokter["voornaam"],"id"=>$dokter['id']);
+                }
+                $doks = json_encode($docs);
+                ecpexit('{"succes":"positive","message":"ok","doks":'.$doks.'}');
+                
+            } else {
+                ecpexit('{"succes":"negative","message":"Oeps :s<br/>De server kreeg niet alle gegevens mee.."}');
+            }
+        } else {
+            $this->std_command();
+        }
+    }
+    /**
+     * lijst ophalen van mantelzorgers voor overleg
+     */
+    public function bewerkvoegmantel(){
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+            if ($this->vars[0]) {
+                ecpimport("components.overleg.overleg.overlegmodel");
+                $vrmod = new ECP_Comp_Overleg_OverlegModel(0);
+
+                $overleg = $vrmod->getOverlegById($this->vars[0], true);
+                if(!$overleg) ecpexit ('{"succes":"negative","error":"Oeps :s<br/>De server weet niet voor welk overleg hij dokters moet zoeken..."}');
+                
+                ecpimport("components.overleg.andere.andermodel");
+                $andmod = new ECP_Comp_Overleg_AnderModel();
+                $dokters = $andmod->getNietBetrokkenMantelzorgers($overleg->getPatientCode());
+                $docs = array();
+                foreach($dokters as $dokter){
+                    $docs[] = array("naam"=>$dokter["naam"].",".$dokter["voornaam"],"id"=>$dokter['id']);
+                }
+                $doks = json_encode($docs);
+                ecpexit('{"succes":"positive","message":"ok","doks":'.$doks.'}');
                 
             } else {
                 ecpexit('{"succes":"negative","message":"Oeps :s<br/>De server kreeg niet alle gegevens mee.."}');
