@@ -127,6 +127,10 @@ class ECP_SiteApp extends ECP_App {
     public function getUser(){
         return $this->user;
     }
+    
+    public function getSession(){
+        return $this->session;
+    }
     /**
      * Create the templatedata wich a template reads to add content.
      * @param array $data site_conf from (query_result as array) 
