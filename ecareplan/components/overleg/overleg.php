@@ -270,7 +270,8 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
         if ($overleg) {
             $patient = $patmod->getPatientByCode($overleg->getPatientCode(), true);
             $aanvraag = $aanmod->getAanvraagByOverlegId($overleg->getId(), true);
-            $betrokkenen = $andmod->getBetrokkenenByPatientCode($overleg->getPatientCode(),2); //geen object, maar lijst van!!
+            $betrokken = $andmod->getBetrokkenenByPatientCode($overleg->getPatientCode(),2); //geen object, maar lijst van!!
+            $betrokkenen = $andmod->fetchInfoBetrokkenen($betrokken);
         }
         if(!$overleg){
             $this->std_command();
@@ -340,6 +341,37 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
             $this->std_command();
         }
     }
+    
+    /**
+     * Nu gaan we die dokter echt invoegen (want hij werd geselecteerd
+     */
+    public function bewerkinvoegendocs(){
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+            if ($this->vars[0] && isset($_POST)) {
+                ecpimport("components.overleg.overleg.overlegmodel");
+                $vrmod = new ECP_Comp_Overleg_OverlegModel(0);
+
+                $overleg = $vrmod->getOverlegById($this->vars[0], true);
+                if(!$overleg) ecpexit ('{"succes":"negative","error":"Oeps :s<br/>De server weet niet voor welk overleg hij dokters moet zoeken..."}');
+                
+                ecpimport("components.overleg.andere.andermodel");
+                $andmod = new ECP_Comp_Overleg_AnderModel();
+               
+                $dokter = $andmod->getDokterById($_POST['pars'],true);
+                if($dokter==null){
+                    ecpexit('{"succes":"negative","error":"Kon de opgegeven dokter niet meer vinden :s"}');
+                }
+                $update = $andmod->maakHulpverlenerBetrokken($overleg, $dokter);
+                ecpexit('{"succes":"positive","message":"ok"}');
+                
+            } else {
+                ecpexit('{"succes":"negative","message":"Oeps :s<br/>De server kreeg niet alle gegevens mee.."}');
+            }
+        } else {
+            $this->std_command();
+        }
+    }
+    
     /**
      * lijst ophalen van mantelzorgers voor overleg
      */

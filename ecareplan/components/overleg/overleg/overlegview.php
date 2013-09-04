@@ -53,14 +53,26 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
     
     private function tabbladTeam($betrokkenen,$id){
         if($betrokkenen === null){
-            $html = "<h4>Dokters <img src='/listelfinal/lib/images/Doctor.png' onclick='EQ.getPopup(\"doktors\",$id);'/></h4>
+            $html = "<h4>Zorgverleners <img src='/listelfinal/lib/images/Doctor.png' onclick='EQ.getPopup(\"doktors\",$id);'/></h4>
                      <h4>Mantelzorgers <img src='/listelfinal/lib/images/Doctor-Nurse.png' onclick='EQ.getPopup(\"mantelzorgers\",$id);'/><h4>";
             return $html;
         }else{
+            $dokters = array();
+            $mantels = array();
             foreach($betrokkenen as $betrokken){
-                $h = "bl";
+                if($betrokken['genre']=="hulp") $dokters[] = $betrokken;
+                if($betrokken['genre']=="mantel") $mantels[] = $betrokken;
             }
-            return "vol";
+            ecpimport("template.helper.datatotable");
+            $doktert = new ECP_TemplateHelper_DataToTable($dokters);
+            $doktert->setEmpty("<em>klik op het icoontje naast zorgveleners om er eentje toe te voegen...</em>");
+            $html= "<h4>Zorgverleners <img src='/listelfinal/lib/images/Doctor.png' onclick='EQ.getPopup(\"doktors\",$id);'/></h4>"
+                    .$doktert->get(array("aanwezig","naam","wat","referentie","verwijder","rechten"));
+            $mantelt = new ECP_TemplateHelper_DataToTable($mantels);
+            $mantelt->setEmpty("<em>Klik op het icoontje naast mantelverzorgers om er eentje toe te voegen...</em>");
+            $html .= "<h4>Mantelzorgers <img src='/listelfinal/lib/images/Doctor-Nurse.png' onclick='EQ.getPopup(\"mantelzorgers\",$id);'/></h4>"
+                    .$mantelt->get(array("aanwezig","naam","wat","referentie","verwijder","rechten"));
+            return $html;
         }
     }
 

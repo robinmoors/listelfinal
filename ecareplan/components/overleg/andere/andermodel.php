@@ -15,6 +15,10 @@ class ECP_Comp_Overleg_AnderModel extends ECP_Comp_Overleg_Model {
      * Resetten van het object kan via restartAanvraag();
      * @param integer $pid De ID van de patient!
      */
+    
+    private static $functies=null;
+    private static $verwantschappen=null;
+    
     public function __CONSTRUCT() {
 
     }
@@ -41,6 +45,100 @@ class ECP_Comp_Overleg_AnderModel extends ECP_Comp_Overleg_Model {
             else
                 return self::resultToArray($results, HuidigeBetrokkenen::getFieldNames());
         }
+    }
+    
+    private static function fetchFunctie($functieid){
+        if(self::$functies===null){
+            ecpimport("database.Functies","class");
+            $functie = new Functies();
+            self::$functies = Functies::findByExample(self::$db, $functie);
+        }
+        foreach(self::$functies as $functie){
+            if($functie->getId()==$functieid) return $functie->getNaam ();
+        }
+        return null;
+    }
+    
+    private static function fetchVerwantschap($verwschid){
+        if(self::$verwantschappen===null){
+            ecpimport("database.Verwantschap","class");
+            $functie = new Verwantschap();
+            self::$verwantschappen = Verwantschap::findByExample(self::$db, $functie);
+        }
+        foreach(self::$verwantschappen as $functie){
+            if($functie->getId()==$verwschid) return $functie->getNaam ();
+        }
+        return null;
+    }
+    
+    public function fetchInfoBetrokkenen($betrokkenen = array()){
+        if(!count($betrokkenen)) return null;
+        else{
+            ecpimport("database.Persoon","class");
+            $persoon = new Persoon();
+            ecpimport("database.Hulpverleners","class");
+            $verlener = new Hulpverleners();
+            ecpimport("database.Mantelzorgers","class");
+            $mantel = new Mantelzorgers();
+            $info = array();
+            foreach($betrokkenen as $betrokken){
+                $persoon->setId($betrokken->getPersoonId());
+                $pers = $persoon->findByExample(self::$db, $persoon);
+                switch($pers[0]->getPersoonType()){
+                    case "HVL":
+                        $verlener->setId($persoon->getId());
+                        $hulpverlener = $verlener->findByExample(self::$db, $verlener);
+                        $info[] = array("naam"=>$hulpverlener[0]->getNaam(),"wat"=>self::fetchFunctie($hulpverlener[0]->getFnctId()),
+                            "aanwezig"=>$betrokken->getAanwezig(),"referentie"=>$betrokken->getNamens(),
+                            "rechten"=>$betrokken->getRechten(),"genre"=>$betrokken->getGenre());
+                        break;
+                    default: case "ORG":
+                        //organisatie(persoon)
+                        break;
+                    case "MVZ":
+                        $mantel->setId($persoon->getId());
+                        $mantelzorger = $mantel->findByExample(self::$db, $mantel);
+                        $info[] = array("naam"=>$mantelzorger[0]->getNaam(),"wat"=>self::fetchVerwantschap($mantelzorger[0]->getVerwschId()),
+                            "aanwezig"=>$betrokken->getAanwezig(),"referentie"=>$betrokken->getNamens(),
+                            "rechten"=>$betrokken->getRechten(),"genre"=>$betrokken->getGenre());
+                        break;
+                }
+                
+            }
+            return $info;
+        }
+    }
+    
+    public function getDokterById($id,$obj = false){
+        //Hier regeltjes over welke aanvragen die user nu eigenlijk mag zien...
+        ecpimport("database.Hulpverleners","class");
+        $dokter = new Hulpverleners();
+        $dokter->setId($id);
+        $results = $dokter->findByExample(self::$db, $dokter);
+        if (empty($results)) {
+            return null;
+        } else {
+            if ($obj) {
+                return $results[0];
+            }
+            else
+                return self::resultToArray($results, Hulpverleners::getFieldNames());
+        }
+    }
+    
+    public function maakHulpverlenerBetrokken(\OverlegGewoon $overleg,  \Hulpverleners $hulpverlener){
+        ecpimport("database.HuidigeBetrokkenen","class");
+        $betrokken = new HuidigeBetrokkenen();
+        $betrokken->setAanwezig(0)->setBereikbaarheid("")->setGenre("hulp")->setNamens(0)
+                ->setOverleggenre("gewoon")->setPatientCode($overleg->getPatientCode())
+                ->setPersoonId($hulpverlener->getId())->setRechten(0);
+        try {
+            $update[] = $betrokken->insertIntoDatabase(self::$db);
+            return true;
+        } catch (Exception $e) {
+            ecpexit('{"succes":"negative","error":"Helaas ... Fout:' . htmlentities($e->getMessage()) . '"}');
+        }
+        return true;
     }
     
     public function getNietBetrokkenDokters($pat_code, $obj = false) {

@@ -138,7 +138,8 @@ class ECP_SiteApp extends ECP_App {
         }
         $tdata['baseurl'] = $this->conf->base_url;
         $tdata['user-name'] = $this->user->naam; //Username
-        $tdata['login-button'] = "afmelden";
+        if($this->user->isGuest()) $tdata['login-button']  = "aanmelden";
+        else $tdata['login-button'] = "afmelden";
         //$tdata['title'] = $siteconfig["siteName"];
         $tdata['versionname'] = $this->conf->cur_version;
         //$tdata["headscript"] = " ";
