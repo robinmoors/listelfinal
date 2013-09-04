@@ -52,25 +52,42 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
     }
     
     private function tabbladTeam($betrokkenen,$id){
+        $url = "/listelfinal/lib/images";
         if($betrokkenen === null){
-            $html = "<h4>Zorgverleners <img src='/listelfinal/lib/images/Doctor.png' onclick='EQ.getPopup(\"doktors\",$id);'/></h4>
-                     <h4>Mantelzorgers <img src='/listelfinal/lib/images/Doctor-Nurse.png' onclick='EQ.getPopup(\"mantelzorgers\",$id);'/><h4>";
+            $html = "<h4>Zorgverleners <img src='$url/Doctor.png' onclick='EQ.getPopup(\"doktors\",$id);'/></h4>
+                     <h4>Mantelzorgers <img src='$url/Doctor-Nurse.png' onclick='EQ.getPopup(\"mantelzorgers\",$id);'/><h4>";
             return $html;
         }else{
             $dokters = array();
             $mantels = array();
             foreach($betrokkenen as $betrokken){
+                $betrokken["verwijder"] = "<img src='$url/cross.png' onclick='EQ.setPopup(\"verwijder\",$id,{$betrokken['id']});'/>";
+                $iconaction = "EQ.iconAction(\"#betrokkenrechten{$betrokken['id']}\",
+                    {
+                    on:\"$url/eye.png\",
+                    off:\"$url/eye-close.png\",
+                    error:\"$url/eye--exclamation.png\",
+                    bussy:\"$url/eye-half.png\"
+                    },
+                    {
+                    url:\"overleg/bewerkinvoegenrechten/{$betrokken['id']}\",
+                    pname:\"rechtentoggle\",
+                    onvalue:1,
+                    offvalue:0
+                    });
+                    ";
+                $betrokken["rechten"] = $betrokken["rechten"]==0 ? "<span id='betrokkenrechten{$betrokken['id']}' onclick='$iconaction'><img src='$url/eye-close.png'></span>" : "<span id='betrokkenrechten{$betrokken['id']}' onclick='$iconaction'><img src='$url/eye.png'></span>";
                 if($betrokken['genre']=="hulp") $dokters[] = $betrokken;
                 if($betrokken['genre']=="mantel") $mantels[] = $betrokken;
             }
             ecpimport("template.helper.datatotable");
             $doktert = new ECP_TemplateHelper_DataToTable($dokters);
             $doktert->setEmpty("<em>klik op het icoontje naast zorgveleners om er eentje toe te voegen...</em>");
-            $html= "<h4>Zorgverleners <img src='/listelfinal/lib/images/Doctor.png' onclick='EQ.getPopup(\"doktors\",$id);'/></h4>"
+            $html= "<h4>Zorgverleners <img src='$url/Doctor.png' onclick='EQ.getPopup(\"doktors\",$id);'/></h4>"
                     .$doktert->get(array("aanwezig","naam","wat","referentie","verwijder","rechten"));
             $mantelt = new ECP_TemplateHelper_DataToTable($mantels);
             $mantelt->setEmpty("<em>Klik op het icoontje naast mantelverzorgers om er eentje toe te voegen...</em>");
-            $html .= "<h4>Mantelzorgers <img src='/listelfinal/lib/images/Doctor-Nurse.png' onclick='EQ.getPopup(\"mantelzorgers\",$id);'/></h4>"
+            $html .= "<h4>Mantelzorgers <img src='$url/Doctor-Nurse.png' onclick='EQ.getPopup(\"mantelzorgers\",$id);'/></h4>"
                     .$mantelt->get(array("aanwezig","naam","wat","referentie","verwijder","rechten"));
             return $html;
         }

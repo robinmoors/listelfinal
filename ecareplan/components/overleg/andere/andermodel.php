@@ -20,7 +20,7 @@ class ECP_Comp_Overleg_AnderModel extends ECP_Comp_Overleg_Model {
     private static $verwantschappen=null;
     
     public function __CONSTRUCT() {
-
+           parent::__construct();
     }
 
     /**
@@ -40,6 +40,29 @@ class ECP_Comp_Overleg_AnderModel extends ECP_Comp_Overleg_Model {
         } else {
             if ($obj) {
                 if($obj==2) return $results;
+                return $results[0];
+            }
+            else
+                return self::resultToArray($results, HuidigeBetrokkenen::getFieldNames());
+        }
+    }
+    
+    /**
+     * Haal de overleg betrokkenen op via de id
+     * @param ID $id
+     * @param integer $obj Het Object ja of nee? (nee = resultaat in array
+     * @return null|\AanvraagOverleg|\array steeds null wanneer leeg resultaat anders het object of het resultaatarray
+     */
+    public function getBetrokkenenById($id, $obj = false) {
+        //Hier regeltjes over welke aanvragen die user nu eigenlijk mag zien...
+        ecpimport("database.HuidigeBetrokkenen","class");
+        $betrokken = new HuidigeBetrokkenen();
+        $betrokken->setId($id);
+        $results = $betrokken->findByExample(self::$db, $betrokken);
+        if (empty($results)) {
+            return null;
+        } else {
+            if ($obj) {
                 return $results[0];
             }
             else
@@ -90,7 +113,8 @@ class ECP_Comp_Overleg_AnderModel extends ECP_Comp_Overleg_Model {
                         $hulpverlener = $verlener->findByExample(self::$db, $verlener);
                         $info[] = array("naam"=>$hulpverlener[0]->getNaam(),"wat"=>self::fetchFunctie($hulpverlener[0]->getFnctId()),
                             "aanwezig"=>$betrokken->getAanwezig(),"referentie"=>$betrokken->getNamens(),
-                            "rechten"=>$betrokken->getRechten(),"genre"=>$betrokken->getGenre());
+                            "rechten"=>$betrokken->getRechten(),"genre"=>$betrokken->getGenre(),
+                            "id"=>$betrokken->getId());
                         break;
                     default: case "ORG":
                         //organisatie(persoon)
@@ -100,7 +124,8 @@ class ECP_Comp_Overleg_AnderModel extends ECP_Comp_Overleg_Model {
                         $mantelzorger = $mantel->findByExample(self::$db, $mantel);
                         $info[] = array("naam"=>$mantelzorger[0]->getNaam(),"wat"=>self::fetchVerwantschap($mantelzorger[0]->getVerwschId()),
                             "aanwezig"=>$betrokken->getAanwezig(),"referentie"=>$betrokken->getNamens(),
-                            "rechten"=>$betrokken->getRechten(),"genre"=>$betrokken->getGenre());
+                            "rechten"=>$betrokken->getRechten(),"genre"=>$betrokken->getGenre(),
+                            "id"=>$betrokken->getId());
                         break;
                 }
                 
@@ -124,6 +149,25 @@ class ECP_Comp_Overleg_AnderModel extends ECP_Comp_Overleg_Model {
             else
                 return self::resultToArray($results, Hulpverleners::getFieldNames());
         }
+    }
+    
+    public function toggleRechtenBetrokkenen(\HuidigeBetrokkenen $betrokkenen,$value){
+        if($betrokkenen == null) return null;
+        $betrokkenen->setRechten($value);
+       try {
+            $update[] = $betrokkenen->updateToDatabase(self::$db);
+            return true;
+        } catch (Exception $e) {
+            ecpexit('{"succes":"negative","error":"Helaas ... Fout:' . htmlentities($e->getMessage()) . '"}');
+            return null;
+        }
+        return true;
+    }
+    
+    public function verwijderBetrokkenen(\HuidigeBetrokkenen $betrokkenen){
+        if($betrokkenen == null) return null;
+       $delete = HuidigeBetrokkenen::deleteByFilter(self::$db, new DFC(HuidigeBetrokkenen::FIELD_ID,$betrokkenen->getId(),DFC::EXACT));
+       return $delete;
     }
     
     public function maakHulpverlenerBetrokken(\OverlegGewoon $overleg,  \Hulpverleners $hulpverlener){

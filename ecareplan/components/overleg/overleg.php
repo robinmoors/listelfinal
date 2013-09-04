@@ -371,6 +371,67 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
             $this->std_command();
         }
     }
+    /**
+     * Teammember verwijderen...
+     */
+    public function bewerkinvoegenverw(){
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+            if ($this->vars[0] && isset($_POST)) {
+                ecpimport("components.overleg.overleg.overlegmodel");
+                $vrmod = new ECP_Comp_Overleg_OverlegModel(0);
+
+                $overleg = $vrmod->getOverlegById($this->vars[0], true);
+                if(!$overleg) ecpexit ('{"succes":"negative","error":"Oeps :s<br/>De server weet niet voor welk overleg hij teamleden moet verwijderen..."}');
+                
+                ecpimport("components.overleg.andere.andermodel");
+                $andmod = new ECP_Comp_Overleg_AnderModel();
+               
+                $dokter = $andmod->getBetrokkenenById($_POST['pars'],true);
+                if($dokter==null){
+                    ecpexit('{"succes":"negative","error":"Kon het opgegeven teamlid niet vinden :s<br/>Maar misschien is hij al verdwenen?"}');
+                }
+                $update = $andmod->verwijderBetrokkenen($dokter);
+                if($update!==null)
+                    ecpexit('{"succes":"positive","message":"ok"}');
+                else
+                    ecpexit('{"succes":"negative","error":"Het verwijderen is mislukt."}');
+                
+            } else {
+                ecpexit('{"succes":"negative","message":"Oeps :s<br/>De server kreeg niet alle gegevens mee.."}');
+            }
+        } else {
+            $this->std_command();
+        }
+    }
+    
+    /**
+     * Teammember rechten geven of ontnemen...
+     */
+    public function bewerkinvoegenrechten(){
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+            if ($this->vars[0]) {
+                
+                ecpimport("components.overleg.andere.andermodel");
+                $andmod = new ECP_Comp_Overleg_AnderModel();
+               
+                $dokter = $andmod->getBetrokkenenById($this->vars[0],true);
+                if($dokter==null){
+                    ecpexit('{"succes":"negative","error":"Kon het opgegeven teamlid niet vinden :s"}');
+                }
+                $value = $dokter->getRechten()==0 ? 1 : 0;
+                $update = $andmod->toggleRechtenBetrokkenen($dokter,$value);
+                if($update!==null)
+                    ecpexit('{"succes":"positive","value":"'.$value.'"}');
+                else
+                    ecpexit('{"succes":"negative","error":"Het omzetten is mislukt."}');
+                
+            } else {
+                ecpexit('{"succes":"negative","message":"Oeps :s<br/>De server kreeg niet alle gegevens mee.."}');
+            }
+        } else {
+            $this->std_command();
+        }
+    }
     
     /**
      * lijst ophalen van mantelzorgers voor overleg

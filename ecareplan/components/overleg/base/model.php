@@ -11,7 +11,7 @@ class ECP_Comp_Overleg_Model{
     protected static $db; //db is een static object (zie factory)
     
     public function __construct(){
-        
+        self::$db = ECPFactory::getPDO("Overleg.Gewoon");
     }
     protected static function queryToArray($mysqlresult){
          for($i=0; $i<$mysqlresult->getRows(); $i++){
