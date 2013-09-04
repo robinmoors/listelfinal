@@ -89,5 +89,9 @@ class ECP_Comp_Overleg_View implements ECP_OverlegObservable{
         $this->script.=$this->stack; $this->stack ='';
         return $this;
     }
+    
+    public function __toString() {
+        return $this->state;
+    }
 }
 ?>

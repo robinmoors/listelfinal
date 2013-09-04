@@ -62,6 +62,8 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
             $mantels = array();
             foreach($betrokkenen as $betrokken){
                 $betrokken["verwijder"] = "<img src='$url/cross.png' onclick='EQ.setPopup(\"verwijder\",$id,{$betrokken['id']});'/>";
+                //Iconaction is het scriptje dat voor een toggle van icoontjes zorgt...
+                //hier gaan we dit voor de rechten doen (oogje)
                 $iconaction = "EQ.iconAction(\"#betrokkenrechten{$betrokken['id']}\",
                     {
                     on:\"$url/eye.png\",
@@ -77,6 +79,22 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
                     });
                     ";
                 $betrokken["rechten"] = $betrokken["rechten"]==0 ? "<span id='betrokkenrechten{$betrokken['id']}' onclick='$iconaction'><img src='$url/eye-close.png'></span>" : "<span id='betrokkenrechten{$betrokken['id']}' onclick='$iconaction'><img src='$url/eye.png'></span>";
+                //hier voor de aanwezigheid
+                $iconaction = "EQ.iconAction(\"#betrokkenaanwezig{$betrokken['id']}\",
+                    {
+                    on:\"$url/glass-wide.png\",
+                    off:\"$url/glass-empty.png\",
+                    error:\"$url/glass--exclamation.png\",
+                    bussy:\"$url/glass.png\"
+                    },
+                    {
+                    url:\"overleg/bewerkinvoegenaanwezig/{$betrokken['id']}\",
+                    pname:\"rechtentoggle\",
+                    onvalue:1,
+                    offvalue:0
+                    });
+                    ";
+                $betrokken["aanwezig"] = $betrokken["aanwezig"]==0 ? "<span id='betrokkenaanwezig{$betrokken['id']}' onclick='$iconaction'><img src='$url/glass-empty.png'></span>" : "<span id='betrokkenaanwezig{$betrokken['id']}' onclick='$iconaction'><img src='$url/glass-wide.png'></span>";
                 if($betrokken['genre']=="hulp") $dokters[] = $betrokken;
                 if($betrokken['genre']=="mantel") $mantels[] = $betrokken;
             }
@@ -94,16 +112,25 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
     }
 
     public function editOverleg($overleg, $patient, $aanvraag, $form, $betrokkenen) {
-        $teamcode = $this->tabbladTeam($betrokkenen,$overleg->getId());
+        $this->setState("editoverleg.start");
+        $this->stack = "";
+        $this->setState("team.start");
+        $this->stack .= $this->tabbladTeam($betrokkenen,$overleg->getId());
+        $this->setState("team.end");
+        $teamcode = $this->stack;
+        $this->stack = "";
         $this->title = "Overleg bewerken";
         if ($overleg === null || $overleg === false) {
             $this->content = "Het overleg werd niet gevonden! <a onclick='EQ.reRoute(\"overleg\",true)'>Keer terug naar aanvragen en overleggen.</a>";
+            $this->setState("editoverleg.end");
             $this->export();
         } elseif ($aanvraag === null) {
             $this->content = "Dit overleg werd gepland zonder bijhorende aanvraag!<br/>Het is noodzakelijk voor een overleg om vanuit een aanvraag te vertrekken. <a onclick='EQ.reRoute(\"overleg\",true)'>Keer terug naar aanvragen en overleggen.</a>";
+            $this->setState("editoverleg.end");
             $this->export();
         } else {
-            $content = "<div class='box'>
+            $this->setState("content.start");
+            $this->stack .= "<div class='box'>
                             <h5>Pati&euml;ntinfo</h5>
                             <p>
                             Rijksregisternummer: {$patient->getRijksregister()} <br/>
@@ -125,7 +152,7 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
                           </div><div class='box wrapped'>
                                 <div id='basis' class='tappage'>
                                 <h5>Basisgegevens:</h5><br/>";
-            $content.=$form[0]->getHtml("normal", array("locatie" => "Plaats van het overleg:<br/>", "aanwezig" => "Wie is er aanwezig op het overleg?<br/>", "instemming" => "Instemming met de deelnemers van het overleg. De pati&euml;nt of vertegenwoordiger?<br/>"))
+            $this->stack.=$form[0]->getHtml("normal", array("locatie" => "Plaats van het overleg:<br/>", "aanwezig" => "Wie is er aanwezig op het overleg?<br/>", "instemming" => "Instemming met de deelnemers van het overleg. De pati&euml;nt of vertegenwoordiger?<br/>"))
                     . "</div><div id='team' class='tappage tapdefault'>
                                 <h5>Teamoverleg:</h5><br/>
                                 $teamcode
@@ -136,7 +163,9 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
                       </div><div id='afdruk' class='tappage'>
                                 <h5>Afdrukpagina</h5>
                       </div></div>";
-            $this->content = $content;
+            $this->setState("content.end");
+            $this->content = $this->stack;
+            $this->stack = "";
             $script = self::createTabScript(array("basis", "team", "attest", "taak", "afdruk")) .
                     $form[0]->getScript("/listelfinal/ecareplan/overleg/bewerkopslaan/{$overleg->getId()}", array("title" => "Basisgegevens opslaan", "action" => "Bezig met opslaan..."), "EQ.OVR.close();", "", "else if(json.message){
                                 EQ.OVR.content=json.message; EQ.OVR.refresh('c');

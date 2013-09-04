@@ -265,7 +265,14 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
         $vrform = new ECP_Comp_Overleg_OverlegForm();
         ecpimport("components.overleg.overleg.overlegview"); //view
         $vrview = new ECP_Comp_Overleg_OverlegView($this->app);
-
+        //observer
+        $user = $this->app->getUser();
+        $sel = $user->getSel();
+        if(ecplocate("components.overleg.observers.".$sel)){
+            ecpimport("components.overleg.observers.".$sel);
+            $obs = "ECP_Comp_Overleg_".ucfirst($sel)."_Observer";
+            $vrview->attach(new $obs());
+        }
         $overleg = $vrmod->getOverlegById($this->vars[0], true);
         if ($overleg) {
             $patient = $patmod->getPatientByCode($overleg->getPatientCode(), true);
@@ -420,6 +427,35 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
                 }
                 $value = $dokter->getRechten()==0 ? 1 : 0;
                 $update = $andmod->toggleRechtenBetrokkenen($dokter,$value);
+                if($update!==null)
+                    ecpexit('{"succes":"positive","value":"'.$value.'"}');
+                else
+                    ecpexit('{"succes":"negative","error":"Het omzetten is mislukt."}');
+                
+            } else {
+                ecpexit('{"succes":"negative","message":"Oeps :s<br/>De server kreeg niet alle gegevens mee.."}');
+            }
+        } else {
+            $this->std_command();
+        }
+    }
+    
+    /**
+     * Teammember aanwezig maken of afwezig...
+     */
+    public function bewerkinvoegenaanwezig(){
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+            if ($this->vars[0]) {
+                
+                ecpimport("components.overleg.andere.andermodel");
+                $andmod = new ECP_Comp_Overleg_AnderModel();
+               
+                $dokter = $andmod->getBetrokkenenById($this->vars[0],true);
+                if($dokter==null){
+                    ecpexit('{"succes":"negative","error":"Kon het opgegeven teamlid niet vinden :s"}');
+                }
+                $value = $dokter->getAanwezig()==0 ? 1 : 0;
+                $update = $andmod->toggleAanwezigBetrokkenen($dokter,$value);
                 if($update!==null)
                     ecpexit('{"succes":"positive","value":"'.$value.'"}');
                 else

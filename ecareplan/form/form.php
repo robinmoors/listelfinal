@@ -177,7 +177,7 @@ class ECP_Form extends ECP_Object implements ECP_FactoryInterface {
     public function removeField($field, $returnbool = false) {
         $returnval = $returnbool ? true : $this;
         if ($field instanceof ECP_FormObj) {
-            if (array_key_exists($field, $this->obj[$field->name])) {
+            if (array_key_exists($field->name, $this->obj)) {
                 unset($this->obj[$field->name]); //veld verwijderen
                 $index = array_search($field->name, $this->names);
                 unset($this->names[$index[0]]);

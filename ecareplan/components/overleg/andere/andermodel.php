@@ -111,7 +111,7 @@ class ECP_Comp_Overleg_AnderModel extends ECP_Comp_Overleg_Model {
                     case "HVL":
                         $verlener->setId($persoon->getId());
                         $hulpverlener = $verlener->findByExample(self::$db, $verlener);
-                        $info[] = array("naam"=>$hulpverlener[0]->getNaam(),"wat"=>self::fetchFunctie($hulpverlener[0]->getFnctId()),
+                        $info[] = array("naam"=>$hulpverlener[0]->getNaam().",".$hulpverlener[0]->getVoornaam(),"wat"=>self::fetchFunctie($hulpverlener[0]->getFnctId()),
                             "aanwezig"=>$betrokken->getAanwezig(),"referentie"=>$betrokken->getNamens(),
                             "rechten"=>$betrokken->getRechten(),"genre"=>$betrokken->getGenre(),
                             "id"=>$betrokken->getId());
@@ -122,7 +122,7 @@ class ECP_Comp_Overleg_AnderModel extends ECP_Comp_Overleg_Model {
                     case "MVZ":
                         $mantel->setId($persoon->getId());
                         $mantelzorger = $mantel->findByExample(self::$db, $mantel);
-                        $info[] = array("naam"=>$mantelzorger[0]->getNaam(),"wat"=>self::fetchVerwantschap($mantelzorger[0]->getVerwschId()),
+                        $info[] = array("naam"=>$mantelzorger[0]->getNaam().",".$mantelzorger[0]->getVoornaam(),"wat"=>self::fetchVerwantschap($mantelzorger[0]->getVerwschId()),
                             "aanwezig"=>$betrokken->getAanwezig(),"referentie"=>$betrokken->getNamens(),
                             "rechten"=>$betrokken->getRechten(),"genre"=>$betrokken->getGenre(),
                             "id"=>$betrokken->getId());
@@ -154,6 +154,19 @@ class ECP_Comp_Overleg_AnderModel extends ECP_Comp_Overleg_Model {
     public function toggleRechtenBetrokkenen(\HuidigeBetrokkenen $betrokkenen,$value){
         if($betrokkenen == null) return null;
         $betrokkenen->setRechten($value);
+       try {
+            $update[] = $betrokkenen->updateToDatabase(self::$db);
+            return true;
+        } catch (Exception $e) {
+            ecpexit('{"succes":"negative","error":"Helaas ... Fout:' . htmlentities($e->getMessage()) . '"}');
+            return null;
+        }
+        return true;
+    }
+    
+    public function toggleAanwezigBetrokkenen(\HuidigeBetrokkenen $betrokkenen,$value){
+        if($betrokkenen == null) return null;
+        $betrokkenen->setAanwezig($value);
        try {
             $update[] = $betrokkenen->updateToDatabase(self::$db);
             return true;
