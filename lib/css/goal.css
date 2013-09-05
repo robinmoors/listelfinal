@@ -7,6 +7,40 @@ html, body, div, form, h1, h2, h3, h4, h5, h6, li, ul, ol{
     margin: 0;
     padding: 0;
 }
+ul.tabinterface{
+    float:left;
+}
+
+ul.tabinterface li{
+    display:inline-block;
+    padding-right: 3px;
+    -webkit-transition: all .50s ease;
+    -moz-transition: all .50s ease;
+    -o-transiton: all .50s ease;
+    transition: all .50s ease;
+    padding: 5px 8px 7px 5px;
+}
+
+ul.tabinterface li.selected{
+    font-weight: bold;
+    padding: 5px 5px 2px 5px;
+    border-bottom: solid 3px hsl(7,67%,34%);
+}
+
+ul.tabinterface li:hover{
+    font-weight: bold;
+    cursor: pointer;
+    padding: 5px 5px 0 5px;
+    background: hsl(7,67%,34%);
+    border-bottom: solid 5px hsl(7,67%,34%);
+}
+
+.red{
+    background: hsl(7,67%,54%);
+}
+.green{
+    background: #008000;
+}
 @media screen and (min-width:540px){
     h1{
         font-size:1.825em;
@@ -228,6 +262,16 @@ nav ul{
     font-size: 0;
     height: 0px;
     clear: both;
+}.tappage{
+    display:none;
+}.tappage.tapdefault{
+    display:block;
+}
+.wrapped{
+    border-top: 1px #FFBD40 groove;
+}
+.box.wrapped{
+    margin-top: 0;
 }
 
 

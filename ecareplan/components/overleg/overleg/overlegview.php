@@ -111,7 +111,7 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
         }
     }
 
-    public function editOverleg($overleg, $patient, $aanvraag, $form, $betrokkenen) {
+    public function editOverleg($overleg, $patient, $aanvraag, $form, $betrokkenen,$msg) {
         $this->setState("editoverleg.start");
         $this->stack = "";
         $this->setState("team.start");
@@ -141,7 +141,7 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
                             Start van het overleg: {$overleg->getDatum()}<br/>
                             Organisatie aanvrager: {$aanvraag->getOrganisatieAanvrager()}<br/>
                             Doel: het doel
-                    </div><div class='box selfclear'>
+                    </div><div class='box'>$msg</div><div class='box selfclear'>
                             <ul class='tabinterface'>
                             <li id='basis-but'>Basisgegevens</li>
                             <li class='selected' id='team-but'>Teamoverleg</li>
@@ -166,11 +166,13 @@ class ECP_Comp_Overleg_OverlegView extends ECP_Comp_Overleg_View {
             $this->setState("content.end");
             $this->content = $this->stack;
             $this->stack = "";
-            $script = self::createTabScript(array("basis", "team", "attest", "taak", "afdruk")) .
+            $this->setState("script.start");
+            $this->stack.= self::createTabScript(array("basis", "team", "attest", "taak", "afdruk")) .
                     $form[0]->getScript("/listelfinal/ecareplan/overleg/bewerkopslaan/{$overleg->getId()}", array("title" => "Basisgegevens opslaan", "action" => "Bezig met opslaan..."), "EQ.OVR.close();", "", "else if(json.message){
                                 EQ.OVR.content=json.message; EQ.OVR.refresh('c');
                             }");
-            $this->script = $script;
+            $this->setState("script.end");
+            $this->script = $this->stack;
             $this->export();
         }
     }

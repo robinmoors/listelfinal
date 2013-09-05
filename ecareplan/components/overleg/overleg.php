@@ -284,12 +284,20 @@ class ECP_Comp_Overleg_Controller implements ECP_ComponentController {
             $this->std_command();
             exit();
         }
+        //kijken wat er nog moet gebeuren volgens de sel...
+        $msg = "";
+        if(ecplocate("components.overleg.afronden.".$sel)){
+            ecpimport("components.overleg.afronden.".$sel);
+            $afr = "ECP_Comp_Overleg_".ucfirst($sel)."_Afronden";
+            $afronder = new $afr();
+            $msg= $afronder->getMessage($overleg, $patient, $aanvraag, $betrokkenen);
+        }
         $overlegvalues = $overleg->toHash();
         $form = array();
         $form[0] = $vrform->getBasis();
         $form[0]->smartInsert($overlegvalues);
 
-        $vrview->editOverleg($overleg, $patient, $aanvraag, $form, $betrokkenen);
+        $vrview->editOverleg($overleg, $patient, $aanvraag, $form, $betrokkenen,$msg);
     }
 
     public function bewerkopslaan() {
